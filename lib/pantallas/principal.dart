@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'barra_nav/busqueda.dart';
+import 'barra_nav/inicio_us.dart';
+import 'barra_nav/perfil.dart';
 
 class PrincipalUser extends StatefulWidget {
   const PrincipalUser({super.key});
@@ -13,6 +16,12 @@ class PrincipalUser extends StatefulWidget {
 class _PrincipalUserState extends State<PrincipalUser> {
   int _currentIndex = 0;
   String userName = "";
+  List<Widget> _children = [PantallaUS(), PantallaBusqueda(), PantallaPerfil()];
+  final List<String> _titles = [
+    "Lista de productos",
+    "Búsqueda de productos",
+    "Perfil"
+  ];
 
   void _onTabTapped(int index) {
     setState(() {
@@ -39,6 +48,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
         if (userData != null && userData["nombre"] != null) {
           setState(() {
             userName = userData["nombre"];
+            print(userName);
           });
         }
       }
@@ -86,9 +96,8 @@ class _PrincipalUserState extends State<PrincipalUser> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
         automaticallyImplyLeading: false, // Quitamos la flecha de retroceso
-        title: Text("Bienvenid@ $userName"),
+        title: Text(_titles[_currentIndex]),
         actions: [
           PopupMenuButton(
             onSelected: (value) {
@@ -107,19 +116,17 @@ class _PrincipalUserState extends State<PrincipalUser> {
           ),
         ],
       ),
-      body: Container(
-        color: Colors.white,
-        child: const Center(
-          child: Text(
-            'Contenido de la pantalla de PrincipalUser',
-            style: TextStyle(fontSize: 20),
-          ),
-        ),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _children,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
         currentIndex: _currentIndex,
-        onTap: _onTabTapped,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),

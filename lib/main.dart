@@ -18,18 +18,32 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        routes: {'/login': (context) => const LoginScreen()},
+        routes: {
+          '/login': (context) => const LoginScreen(),
+        },
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          colorScheme: ColorScheme.fromSwatch(
+            primarySwatch:
+                Colors.blue, // Cambia a tu color principal deseado aquí
+          ).copyWith(
+            secondary: Colors.blue, // Cambia a tu color secundario deseado aquí
+            surface: Colors.white, // Cambia el color de la superficie aquí
+            background: Colors.white, // Cambia el color de fondo aquí
+          ),
           brightness: Brightness.light, // Set light theme
+          scaffoldBackgroundColor:
+              Colors.white, // Set background color to white
           useMaterial3: true,
         ),
-        darkTheme: ThemeData(
-          primarySwatch: Colors.blue,
-          brightness: Brightness.light, // Set dark theme
-          useMaterial3: true,
-        ),
+        // darkTheme: ThemeData(
+        //   primarySwatch: Colors.blue,
+
+        //   brightness: Brightness.dark, // Set dark theme
+        //   scaffoldBackgroundColor:
+        //       Colors.black, // Set background color to black everywhere
+        //   useMaterial3: true,
+        // ),
         home: const LoginScreen());
   }
 }
