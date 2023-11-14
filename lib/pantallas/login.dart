@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -63,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final Auth _auth = Auth();
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
-  double _elementsOpacity = 1;
+  final double _elementsOpacity = 1;
   StreamSubscription<User?>? _authStateChangesSubscription;
   bool loadingBallAppear = false;
 
@@ -74,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // El usuario está autenticado, redirigir a la pantalla principal
         Navigator.push(
           context,
-          SlideFromRightPageRoute(enterPage: PrincipalUser()),
+          SlideFromRightPageRoute(enterPage: const PrincipalUser()),
         );
       }
     });
@@ -122,20 +124,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _registrar() async {
-    String email = _emailController.text;
-    String password = _passwordController.text;
-    try {
-      await _auth.registrarEmailPass(email, password);
-      print("Hola si me registre");
-      // Resto del código después del inicio de sesión exitoso
-    } catch (e) {
-      String errorMessage = "Hubo un error + $e";
-      _showErrorDialog(errorMessage);
-    }
-    // Aquí puedes agregar lógica adicional después del registro exitoso
-  }
-
   void _iniciarSesion() async {
     String email = _emailController.text;
     String password = _passwordController.text;
@@ -158,8 +146,8 @@ class _LoginScreenState extends State<LoginScreen> {
         if (userData != null && userData["tipo"] == "usuario") {
           // El usuario es un usuario normal
           print("Es un usuario");
-          Navigator.push(
-              context, SlideFromRightPageRoute(enterPage: PrincipalUser()));
+          Navigator.push(context,
+              SlideFromRightPageRoute(enterPage: const PrincipalUser()));
           // Aquí puedes realizar acciones específicas para los usuarios normales
         } else if (userData != null && userData["tipo"] == "admin") {
           // El usuario es un administrador
@@ -167,7 +155,8 @@ class _LoginScreenState extends State<LoginScreen> {
           // Aquí puedes realizar acciones específicas para los administradores
         } else {
           // El usuario no tiene el campo "tipo" definido o no es ni usuario ni admin
-          print("El tipo de usuario no está definido correctamente.");
+          print(
+              "El tipo de usuario no está definido correctamente. [admin/usuario]]");
         }
       }
     } else {
@@ -181,13 +170,16 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+      ),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         bottom: false,
         child: loadingBallAppear
             ? const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30.0),
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 35.0),
               )
             : Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50.0),
@@ -204,14 +196,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
+                              const Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.medication,
+                                  Icon(Icons.medication,
                                       size: 60,
                                       color: Color.fromARGB(255, 0, 105, 243)),
-                                  const SizedBox(height: 5),
-                                  const Text("Hyzar",
+                                  SizedBox(height: 5),
+                                  Text("Hyzar",
                                       style: TextStyle(
                                           fontSize: 30,
                                           color:
@@ -272,7 +264,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Navigator.push(
                                       context,
                                       SlideFromRightPageRoute(
-                                          enterPage: RegistroUsuarioScreen()));
+                                          enterPage:
+                                              const RegistroUsuarioScreen()));
                                 },
                                 onAnimatinoEnd: () async {
                                   // Add your logic here for the second button.

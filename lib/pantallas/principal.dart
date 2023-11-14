@@ -3,7 +3,10 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class PrincipalUser extends StatefulWidget {
+  const PrincipalUser({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _PrincipalUserState createState() => _PrincipalUserState();
 }
 
@@ -66,6 +69,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
                 // ignore: use_build_context_synchronously
                 Navigator.pushNamedAndRemoveUntil(
                     context, '/login', (Route<dynamic> route) => false);
+                print("Sesión cerrada correctamente");
               } catch (e) {
                 print("Error al cerrar sesión: $e");
                 // Aquí puedes manejar cualquier error que pueda ocurrir al cerrar sesión
@@ -82,6 +86,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         automaticallyImplyLeading: false, // Quitamos la flecha de retroceso
         title: Text("Bienvenid@ $userName"),
         actions: [
@@ -112,20 +117,21 @@ class _PrincipalUserState extends State<PrincipalUser> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
-        items: [
-          const BottomNavigationBarItem(
+        items: const [
+          BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: 'Inicio',
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.search),
-            label: 'Search',
+            label: 'Busqueda',
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profile',
+            label: 'Usuario',
           ),
         ],
       ),
