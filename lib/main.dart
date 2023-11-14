@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         ),
         darkTheme: ThemeData(
           primarySwatch: Colors.blue,
-          brightness: Brightness.dark, // Set dark theme
+          brightness: Brightness.light, // Set dark theme
           useMaterial3: true,
         ),
         home: const LoginScreen());
