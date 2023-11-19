@@ -15,6 +15,7 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
   bool mostrarDropdown = false;
   int eliminado = 0;
   late TextEditingController nombreController;
+  late TextEditingController descripcionController;
   late TextEditingController existenciasController;
   late TextEditingController precioFarmController;
   late TextEditingController precioPubController;
@@ -28,6 +29,8 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
     super.initState();
     nombreController =
         TextEditingController(text: widget.medicamento['nombre']);
+    descripcionController =
+        TextEditingController(text: widget.medicamento['descripcion']);
     existenciasController = TextEditingController(
         text: widget.medicamento['existencias'].toString());
     precioFarmController = TextEditingController(
@@ -53,6 +56,7 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
                       .doc(widget.medicamento['id'])
                       .update({
                     'nombre': nombreController.text,
+                    'descripcion': descripcionController.text,
                     'existencias': int.parse(existenciasController.text),
                     'precio_farm': double.parse(precioFarmController.text),
                     'precio_pub': double.parse(precioPubController.text),
@@ -103,6 +107,17 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
                         ? TextField(controller: nombreController)
                         : Text(
                             '${data['nombre']}',
+                            style: TextStyle(fontSize: 24),
+                          ),
+                  ),
+                ),
+                Card(
+                  child: ListTile(
+                    leading: Icon(Icons.description),
+                    title: editing
+                        ? TextField(controller: descripcionController)
+                        : Text(
+                            '${data['descripcion']}',
                             style: TextStyle(fontSize: 24),
                           ),
                   ),

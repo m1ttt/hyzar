@@ -40,8 +40,10 @@ dependencies:
   firebase_core: ^2.15.0
   firebase_dynamic_links: ^5.3.4
   firebase_database: ^10.2.4
+  firebase_storage: ^11.5.1
   cloud_firestore: ^4.13.1
   vibration: ^1.7.3
+  image_picker: ^1.0.4
 
 
 dev_dependencies:

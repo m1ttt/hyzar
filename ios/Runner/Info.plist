@@ -4,6 +4,8 @@
 <dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Activa la camara para poder escanear el código</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Activa el acceso a tu galería para subir el archivo de la foto</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

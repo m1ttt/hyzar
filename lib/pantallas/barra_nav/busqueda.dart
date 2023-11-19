@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:vibration/vibration.dart';
 import 'DetalleMedicamentoScreen.dart';
 
 class PantallaBusqueda extends StatefulWidget {
@@ -28,6 +28,10 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
           .doc(codigo)
           .get();
       if (doc.exists) {
+        if ((await Vibration.hasVibrator()) ?? false) {
+          // Comprueba si el dispositivo tiene un vibrador
+          Vibration.vibrate(); // Hace vibrar el dispositivo
+        }
         setState(() {
           Map<String, dynamic> medicamento = doc.data() as Map<String, dynamic>;
           medicamento['codigo'] =
@@ -61,7 +65,10 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
               var res = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const SimpleBarcodeScannerPage(),
+                    builder: (context) => const SimpleBarcodeScannerPage(
+                      appBarTitle: 'Escanear Código',
+                      isShowFlashIcon: true,
+                    ),
                   ));
               if (res is String) {
                 bc_code_result = res;
@@ -110,6 +117,8 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
                         children: [
                           Text(
                               'Código: ${medicamento['codigo'] ?? 'No hay datos'}'),
+                          Text(
+                              'Descripción: ${medicamento['descripcion'] ?? 'No hay datos'}'),
                           Text(
                               'Existencias: ${medicamento['existencias'] ?? 'No hay datos'}'),
                           Text(
