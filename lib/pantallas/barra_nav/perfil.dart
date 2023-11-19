@@ -4,8 +4,10 @@ class PantallaPerfil extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Perfil'),
+      ),
       body: ListView(
-        //padding a los lados
         padding: const EdgeInsets.all(10),
         children: <Widget>[
           Card(

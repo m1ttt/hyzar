@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'barra_nav/busqueda.dart';
 import 'barra_nav/inicio_us.dart';
 import 'barra_nav/perfil.dart';
+import 'barra_nav/agregar.dart';
 
 class PrincipalUser extends StatefulWidget {
   const PrincipalUser({super.key});
@@ -16,10 +17,15 @@ class PrincipalUser extends StatefulWidget {
 class _PrincipalUserState extends State<PrincipalUser> {
   int _currentIndex = 0;
   String userName = "";
-  List<Widget> _children = [PantallaUS(), PantallaBusqueda(), PantallaPerfil()];
+  List<Widget> _children = [
+    PantallaUS(),
+    PantallaBusqueda(),
+    PantallaAgregar(),
+  ];
   final List<String> _titles = [
     "Lista de productos",
-    "Búsqueda de productos",
+    "Búsqueda",
+    "Agregar",
     "Perfil"
   ];
 
@@ -104,9 +110,21 @@ class _PrincipalUserState extends State<PrincipalUser> {
               if (value == 'cerrarSesion') {
                 _cerrarSesion();
               }
+              if (value == 'perfil') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PantallaPerfil(),
+                  ),
+                );
+              }
             },
             itemBuilder: (BuildContext context) {
               return [
+                const PopupMenuItem(
+                  value: 'perfil',
+                  child: Text('Perfil'),
+                ),
                 const PopupMenuItem(
                   value: 'cerrarSesion',
                   child: Text('Cerrar Sesión'),
@@ -137,8 +155,8 @@ class _PrincipalUserState extends State<PrincipalUser> {
             label: 'Busqueda',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Usuario',
+            icon: Icon(Icons.add),
+            label: 'Agregar',
           ),
         ],
       ),
