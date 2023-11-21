@@ -60,11 +60,13 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
             uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
           });
         });
-        await uploadTask;
-        taskSnapshot.cancel();
+        await uploadTask.whenComplete(() => taskSnapshot.cancel());
         datos['imagen'] = await ref.getDownloadURL();
         Navigator.of(context).pop(); // Cierra el cuadro de diálogo
-        imagen.delete(); // Elimina la imagen del dispositivo
+
+        setState(() {
+          _imageFile = null; // Elimina la imagen de la pantalla
+        });
       }
       await FirebaseFirestore.instance
           .collection('medicamentos')

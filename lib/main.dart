@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
                 Colors.blue, // Cambia a tu color principal deseado aquí
           ).copyWith(
             secondary: Colors.blue, // Cambia a tu color secundario deseado aquí
-            surface: Colors.white, // Cambia el color de la superficie aquí
+            surface: Colors.white, // Cambia el color de la superficie aquí       
             background: Colors.white, // Cambia el color de fondo aquí
           ),
           brightness: Brightness.light, // Set light theme
