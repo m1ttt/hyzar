@@ -194,6 +194,7 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
                   decoration: InputDecoration(
                     labelText: 'Precio Farmacia',
                   ),
+                  keyboardType: TextInputType.number,
                 ),
               ),
               Card(
@@ -202,6 +203,7 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
                   decoration: InputDecoration(
                     labelText: 'Precio Público',
                   ),
+                  keyboardType: TextInputType.number,
                 ),
               ),
               ElevatedButton(

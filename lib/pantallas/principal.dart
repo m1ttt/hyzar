@@ -5,9 +5,11 @@ import 'barra_nav/busqueda.dart';
 import 'barra_nav/inicio_us.dart';
 import 'barra_nav/perfil.dart';
 import 'barra_nav/agregar.dart';
+import 'barra_nav_us/pedidos.dart';
 
 class PrincipalUser extends StatefulWidget {
-  const PrincipalUser({super.key});
+  final User user;
+  const PrincipalUser({super.key, required this.user});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -17,16 +19,31 @@ class PrincipalUser extends StatefulWidget {
 class _PrincipalUserState extends State<PrincipalUser> {
   int _currentIndex = 0;
   String userName = "";
-  List<Widget> _children = [
-    PantallaUS(),
+  String tipoUsuario = 'usuario';
+
+  late List<Widget> _childrenUsuario = [
+    PantallaUS(userType: tipoUsuario),
     PantallaBusqueda(),
+    PantallaPedidos(),
+  ];
+  late List<Widget> _childrenAdmin = [
+    PantallaUS(
+      userType: tipoUsuario,
+    ),
+    PantallaBusqueda(),
+    PantallaPedidos(),
     PantallaAgregar(),
   ];
-  final List<String> _titles = [
+  final List<String> _titlesUsuario = [
     "Lista de productos",
     "Búsqueda",
+    "Pedidos"
+  ];
+  final List<String> _titlesAdmin = [
+    "Lista de productos",
+    "Búsqueda",
+    "Pedidos",
     "Agregar",
-    "Perfil"
   ];
 
   void _onTabTapped(int index) {
@@ -37,31 +54,44 @@ class _PrincipalUserState extends State<PrincipalUser> {
 
   @override
   void initState() {
-    _loadUserName();
+    _childrenUsuario = [
+      PantallaUS(userType: tipoUsuario),
+      PantallaBusqueda(),
+      PantallaPedidos(),
+    ];
+    _childrenAdmin = [
+      PantallaUS(
+        userType: tipoUsuario,
+      ),
+      PantallaBusqueda(),
+      PantallaPedidos(),
+      PantallaAgregar(),
+    ];
+    _loadUserType();
+    _loadUserType();
     super.initState();
   }
 
-  Future<String> _loadUserName() async {
+  Future<void> _loadUserType() async {
     try {
       User? currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null) {
         String userID = currentUser.uid;
         DatabaseReference userRef =
             FirebaseDatabase.instance.ref().child("usuarios").child(userID);
-        DataSnapshot snapshot = (await userRef.once()) as DataSnapshot;
+        DatabaseEvent snapshot = await userRef.once();
         Map<dynamic, dynamic>? userData =
-            snapshot.value as Map<dynamic, dynamic>?;
-        if (userData != null && userData["nombre"] != null) {
+            snapshot.snapshot.value as Map<dynamic, dynamic>?;
+        if (userData != null && userData["tipo"] != null) {
           setState(() {
-            userName = userData["nombre"];
-            print(userName);
+            tipoUsuario = userData["tipo"];
+            _currentIndex = 0; // Restablecer el índice a 0
           });
         }
       }
     } catch (e) {
-      print("Error al cargar el nombre del usuario: $e");
+      print("Error al cargar el tipo de usuario: $e");
     }
-    return userName; // Devuelve el nombre del usuario
   }
 
   void _cerrarSesion() async {
@@ -100,6 +130,33 @@ class _PrincipalUserState extends State<PrincipalUser> {
 
   @override
   Widget build(BuildContext context) {
+    print('Tipo de usuario: $tipoUsuario');
+    List<Widget> _children =
+        tipoUsuario == 'admin' ? _childrenAdmin : _childrenUsuario;
+    List<String> _titles =
+        tipoUsuario == 'admin' ? _titlesAdmin : _titlesUsuario;
+    List<BottomNavigationBarItem> _items = [
+      BottomNavigationBarItem(
+        icon: Icon(Icons.home),
+        label: 'Inicio',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.search),
+        label: 'Busqueda',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.insert_invitation_rounded),
+        label: 'Pedidos',
+      ),
+    ];
+    if (tipoUsuario == 'admin') {
+      _items.add(
+        BottomNavigationBarItem(
+          icon: Icon(Icons.add),
+          label: 'Agregar',
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false, // Quitamos la flecha de retroceso
@@ -114,7 +171,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PantallaPerfil(),
+                    builder: (context) => PantallaPerfil(user: widget.user),
                   ),
                 );
               }
@@ -134,31 +191,12 @@ class _PrincipalUserState extends State<PrincipalUser> {
           ),
         ],
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _children,
-      ),
+      body: _children[_currentIndex], // Cambiado a _children[_currentIndex]
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Inicio',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Busqueda',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Agregar',
-          ),
-        ],
+        onTap: _onTabTapped, // Cambiado a _onTabTapped
+        items: _items,
       ),
     );
   }

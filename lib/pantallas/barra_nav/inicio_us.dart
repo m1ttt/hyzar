@@ -1,8 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'DetalleMedicamentoScreen.dart';
 
 class PantallaUS extends StatefulWidget {
+  final String userType;
+  const PantallaUS({Key? key, required this.userType}) : super(key: key);
+
   @override
   _PantallaUSState createState() => _PantallaUSState();
 }
@@ -14,7 +18,21 @@ class _PantallaUSState extends State<PantallaUS>
   late AnimationController _animationController;
   late Animation<double> _animation;
   final ScrollController _scrollController = ScrollController();
+  final Set<String> _selectedItems =
+      Set<String>(); // Nuevo: para almacenar los elementos seleccionados
   bool _showLabel = true;
+
+  void _toggleSelection(String itemId) {
+    if (widget.userType == 'usuari') {
+      if (_selectedItems.contains(itemId)) {
+        _selectedItems.remove(itemId);
+      } else {
+        _selectedItems.add(itemId);
+      }
+      print(_selectedItems);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -102,32 +120,42 @@ class _PantallaUSState extends State<PantallaUS>
                 } else if (!mostrarSoloEliminados && data['eliminado'] == 1) {
                   return Container(height: 0, width: 0);
                 } else {
-                  return Hero(
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetalleMedicamentoScreen(
+                              userType: widget.userType, medicamento: data),
+                        ),
+                      );
+                    },
+                    onLongPress: () {
+                      if (widget.userType == 'usuario') {
+                        setState(() {
+                          _toggleSelection(data['id']);
+                        });
+                      }
+                    },
+                    child: Hero(
                       tag: 'detalle${data['id']}',
                       child: Container(
                         margin: const EdgeInsets.all(5.0),
+                        color: _selectedItems.contains(data['id'])
+                            ? Colors.blue
+                            : null,
                         child: Card(
                           color: color,
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      DetalleMedicamentoScreen(
-                                          medicamento: data),
-                                ),
-                              );
-                            },
-                            child: ListTile(
-                              leading: Icon(Icons.medication, size: 60),
-                              title: Text('${data['nombre']}'),
-                              subtitle:
-                                  Text('Existencias: ${data['existencias']}'),
-                            ),
+                          child: ListTile(
+                            leading: Icon(Icons.medication, size: 60),
+                            title: Text('${data['nombre']}'),
+                            subtitle:
+                                Text('Existencias: ${data['existencias']}'),
                           ),
                         ),
-                      ));
+                      ),
+                    ),
+                  );
                 }
               },
             );

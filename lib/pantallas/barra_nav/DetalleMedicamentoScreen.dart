@@ -7,8 +7,10 @@ import 'package:sn_progress_dialog/progress_dialog.dart';
 
 class DetalleMedicamentoScreen extends StatefulWidget {
   final Map<String, dynamic> medicamento;
+  final String userType;
 
-  const DetalleMedicamentoScreen({super.key, required this.medicamento});
+  const DetalleMedicamentoScreen(
+      {super.key, required this.medicamento, required this.userType});
 
   @override
   _DetalleMedicamentoScreenState createState() =>
@@ -18,7 +20,7 @@ class DetalleMedicamentoScreen extends StatefulWidget {
 class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
   bool mostrarDropdown = false;
   int eliminado = 0;
-  ProgressDialog progressDialog = ProgressDialog(context: null);
+
   late TextEditingController nombreController;
   late TextEditingController descripcionController;
   late TextEditingController existenciasController;
@@ -123,48 +125,49 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
       appBar: AppBar(
         title: Text(widget.medicamento['nombre']),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(editing ? Icons.save : Icons.edit),
-            onPressed: () async {
-              if (editing) {
-                try {
-                  String? imageUrl;
-                  if (_imageFile != null) {
-                    final ref = FirebaseStorage.instance
-                        .ref()
-                        .child('medicamentos')
-                        .child(widget.medicamento['id']);
-                    await ref.putFile(_imageFile!);
-                    imageUrl = await ref.getDownloadURL();
-                  }
+          if (widget.userType == 'admin')
+            IconButton(
+              icon: Icon(editing ? Icons.save : Icons.edit),
+              onPressed: () async {
+                if (editing) {
+                  try {
+                    String? imageUrl;
+                    if (_imageFile != null) {
+                      final ref = FirebaseStorage.instance
+                          .ref()
+                          .child('medicamentos')
+                          .child(widget.medicamento['id']);
+                      await ref.putFile(_imageFile!);
+                      imageUrl = await ref.getDownloadURL();
+                    }
 
-                  await FirebaseFirestore.instance
-                      .collection('medicamentos')
-                      .doc(widget.medicamento['id'])
-                      .update({
-                    'nombre': nombreController.text,
-                    'descripcion': descripcionController.text,
-                    'existencias': int.parse(existenciasController.text),
-                    'precio_farm': double.parse(precioFarmController.text),
-                    'precio_pub': double.parse(precioPubController.text),
-                    'eliminado': eliminado,
-                    if (imageUrl != null)
-                      'imagen': imageUrl, // Agrega esta línea
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text("Datos actualizados correctamente")),
-                  );
-                } catch (e) {
-                  print('Error al actualizar los datos: $e');
+                    await FirebaseFirestore.instance
+                        .collection('medicamentos')
+                        .doc(widget.medicamento['id'])
+                        .update({
+                      'nombre': nombreController.text,
+                      'descripcion': descripcionController.text,
+                      'existencias': int.parse(existenciasController.text),
+                      'precio_farm': double.parse(precioFarmController.text),
+                      'precio_pub': double.parse(precioPubController.text),
+                      'eliminado': eliminado,
+                      if (imageUrl != null)
+                        'imagen': imageUrl, // Agrega esta línea
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text("Datos actualizados correctamente")),
+                    );
+                  } catch (e) {
+                    print('Error al actualizar los datos: $e');
+                  }
                 }
-              }
-              setState(() {
-                editing = !editing;
-                mostrarDropdown = !mostrarDropdown;
-              });
-            },
-          ),
+                setState(() {
+                  editing = !editing;
+                  mostrarDropdown = !mostrarDropdown;
+                });
+              },
+            ),
         ],
       ),
       body: StreamBuilder<DocumentSnapshot>(
@@ -263,17 +266,18 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
                             ),
                     ),
                   ),
-                  Card(
-                    child: ListTile(
-                      leading: const Icon(Icons.money),
-                      title: editing
-                          ? TextField(controller: precioFarmController)
-                          : Text(
-                              'Precio Farmacia: ${data['precio_farm']}',
-                              style: const TextStyle(fontSize: 20),
-                            ),
+                  if (widget.userType == 'admin')
+                    Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.money),
+                        title: editing
+                            ? TextField(controller: precioFarmController)
+                            : Text(
+                                'Precio Farmacia: ${data['precio_farm']}',
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                      ),
                     ),
-                  ),
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.money),
@@ -285,34 +289,35 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
                             ),
                     ),
                   ),
-                  Card(
-                    child: ListTile(
-                      leading: const Icon(Icons.delete_forever),
-                      title: editing
-                          ? DropdownButton<int>(
-                              value: eliminado,
-                              items: const [
-                                DropdownMenuItem(
-                                  value: 0,
-                                  child: Text('No'),
-                                ),
-                                DropdownMenuItem(
-                                  value: 1,
-                                  child: Text('Sí'),
-                                ),
-                              ],
-                              onChanged: (int? newValue) {
-                                setState(() {
-                                  eliminado = newValue!;
-                                });
-                              },
-                            )
-                          : Text(
-                              'Suspendido: ${data['eliminado'] == 1 ? 'Sí' : 'No'}',
-                              style: const TextStyle(fontSize: 20),
-                            ),
+                  if (widget.userType == 'admin')
+                    Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.delete_forever),
+                        title: editing
+                            ? DropdownButton<int>(
+                                value: eliminado,
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: 0,
+                                    child: Text('No'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 1,
+                                    child: Text('Sí'),
+                                  ),
+                                ],
+                                onChanged: (int? newValue) {
+                                  setState(() {
+                                    eliminado = newValue!;
+                                  });
+                                },
+                              )
+                            : Text(
+                                'Suspendido: ${data['eliminado'] == 1 ? 'Sí' : 'No'}',
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),

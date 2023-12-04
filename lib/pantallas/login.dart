@@ -71,13 +71,39 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    _authStateChangesSubscription = _auth.authStateChanges.listen((User? user) {
-      if (user != null) {
-        // El usuario está autenticado, redirigir a la pantalla principal
-        Navigator.push(
-          context,
-          SlideFromRightPageRoute(enterPage: const PrincipalUser()),
-        );
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    _authStateChangesSubscription =
+        _auth.authStateChanges.listen((User? user) async {
+      if (user != null && user != currentUser) {
+        String userID = user.uid;
+        DatabaseReference userRef =
+            FirebaseDatabase.instance.ref().child("usuarios").child(userID);
+        DataSnapshot snapshot = (await userRef.once()).snapshot;
+
+        if (snapshot.value != null) {
+          Map<dynamic, dynamic>? userData =
+              snapshot.value as Map<dynamic, dynamic>?;
+          if (userData != null && userData["tipo"] == "usuario") {
+            // El usuario es un usuario normal
+            print("Es un usuario");
+            Navigator.push(context,
+                SlideFromRightPageRoute(enterPage: PrincipalUser(user: user)));
+            // Aquí puedes realizar acciones específicas para los usuarios normales
+          } else if (userData != null && userData["tipo"] == "admin") {
+            // El usuario es un administrador
+            print("Es un administrador");
+            Navigator.push(context,
+                SlideFromRightPageRoute(enterPage: PrincipalUser(user: user)));
+
+            // Aquí puedes realizar acciones específicas para los administradores
+          } else {
+            // El usuario no tiene el campo "tipo" definido o no es ni usuario ni admin
+            print(
+                "El tipo de usuario no está definido correctamente. [admin/usuario]]");
+          }
+        }
+      } else {
+        print("No hay usuario autenticado");
       }
     });
     _emailController = TextEditingController();
@@ -147,11 +173,14 @@ class _LoginScreenState extends State<LoginScreen> {
           // El usuario es un usuario normal
           print("Es un usuario");
           Navigator.push(context,
-              SlideFromRightPageRoute(enterPage: const PrincipalUser()));
+              SlideFromRightPageRoute(enterPage: PrincipalUser(user: user)));
           // Aquí puedes realizar acciones específicas para los usuarios normales
         } else if (userData != null && userData["tipo"] == "admin") {
           // El usuario es un administrador
           print("Es un administrador");
+          Navigator.push(context,
+              SlideFromRightPageRoute(enterPage: PrincipalUser(user: user)));
+
           // Aquí puedes realizar acciones específicas para los administradores
         } else {
           // El usuario no tiene el campo "tipo" definido o no es ni usuario ni admin
