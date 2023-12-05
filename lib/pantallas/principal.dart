@@ -191,12 +191,20 @@ class _PrincipalUserState extends State<PrincipalUser> {
           ),
         ],
       ),
-      body: _children[_currentIndex], // Cambiado a _children[_currentIndex]
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped, // Cambiado a _onTabTapped
-        items: _items,
+      body: _children[_currentIndex],
+      bottomNavigationBar: NavigationBar(
+        onDestinationSelected: (int index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        selectedIndex: _currentIndex,
+        destinations: _items
+            .map((item) => NavigationDestination(
+                  icon: item.icon,
+                  label: item.label ?? '',
+                ))
+            .toList(),
       ),
     );
   }

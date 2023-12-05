@@ -97,9 +97,17 @@ class _PantallaUSState extends State<PantallaUS>
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text("Cargando");
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text("Obteniendo productos..."),
+                    SizedBox(height: 10),
+                    CircularProgressIndicator(),
+                  ],
+                ),
+              );
             }
-
             return ListView.builder(
               controller: _scrollController,
               itemCount: snapshot.data!.docs.length,
@@ -162,33 +170,49 @@ class _PantallaUSState extends State<PantallaUS>
           },
         ),
       ),
-      floatingActionButton: PopupMenuButton<int>(
-        itemBuilder: (context) => [
-          PopupMenuItem(
-            value: 1,
-            child: Text("Ordenar por nombre"),
-          ),
-          PopupMenuItem(
-            value: 2,
-            child: Text("Ver suspendidos"),
-          ),
-          PopupMenuItem(
-            value: 3,
-            child: Text("Ver no suspendidos"),
-          ),
-        ],
-        onSelected: (value) {
-          setState(() {
-            switch (value) {
-              case 1:
-                ordenarPorNombre = !ordenarPorNombre;
-                break;
-              case 2:
-                mostrarSoloEliminados = true;
-                break;
-              case 3:
-                mostrarSoloEliminados = false;
-                break;
+      floatingActionButton: FloatingActionButton.extended(
+        label: Text('Ordenar'), // Agregado un label "Ordenar"
+        onPressed: () {
+          final RenderBox renderBox = context.findRenderObject() as RenderBox;
+          final size = renderBox.size;
+          final offset = renderBox.localToGlobal(Offset.zero);
+          showMenu(
+            context: context,
+            position: RelativeRect.fromLTRB(
+              offset.dx,
+              offset.dy + size.height,
+              offset.dx + size.width,
+              offset.dy,
+            ),
+            items: [
+              PopupMenuItem(
+                value: 1,
+                child: Text("Ordenar por nombre o existencias"),
+              ),
+              PopupMenuItem(
+                value: 2,
+                child: Text("Ver suspendidos"),
+              ),
+              PopupMenuItem(
+                value: 3,
+                child: Text("Ver no suspendidos"),
+              ),
+            ],
+          ).then((value) {
+            if (value != null) {
+              setState(() {
+                switch (value) {
+                  case 1:
+                    ordenarPorNombre = !ordenarPorNombre;
+                    break;
+                  case 2:
+                    mostrarSoloEliminados = true;
+                    break;
+                  case 3:
+                    mostrarSoloEliminados = false;
+                    break;
+                }
+              });
             }
           });
         },
