@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
               brightness: Brightness.light, // Set light theme
               scaffoldBackgroundColor:
                   Colors.white, // Set background color to white
+              typography: Typography.material2021(), // Set typography
               useMaterial3: true,
             ),
             home: const LoginScreen(),

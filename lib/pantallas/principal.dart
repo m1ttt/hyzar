@@ -24,24 +24,24 @@ class _PrincipalUserState extends State<PrincipalUser> {
 
   late List<Widget> _childrenUsuario = [
     PantallaUS(userType: tipoUsuario),
-    PantallaBusqueda(),
+    PantallaBusqueda(
+      userType: tipoUsuario,
+    ),
     PantallaPedidos(),
   ];
   late List<Widget> _childrenAdmin = [
     PantallaUS(
       userType: tipoUsuario,
     ),
-    PantallaBusqueda(),
+    PantallaBusqueda(
+      userType: tipoUsuario,
+    ),
     PantallaPedidos(),
     PantallaAgregar(),
   ];
-  final List<String> _titlesUsuario = [
-    "Lista de productos",
-    "Búsqueda",
-    "Pedidos"
-  ];
+  final List<String> _titlesUsuario = ["Productos", "Búsqueda", "Pedidos"];
   final List<String> _titlesAdmin = [
-    "Lista de productos",
+    "Productos",
     "Búsqueda",
     "Pedidos",
     "Agregar",
@@ -122,14 +122,18 @@ class _PrincipalUserState extends State<PrincipalUser> {
         if (snapshot.connectionState == ConnectionState.done) {
           _childrenUsuario = [
             PantallaUS(userType: tipoUsuario),
-            PantallaBusqueda(),
+            PantallaBusqueda(
+              userType: tipoUsuario,
+            ),
             PantallaPedidos(),
           ];
           _childrenAdmin = [
             PantallaUS(
               userType: tipoUsuario,
             ),
-            PantallaBusqueda(),
+            PantallaBusqueda(
+              userType: tipoUsuario,
+            ),
             PantallaPedidos(),
             PantallaAgregar(),
           ];

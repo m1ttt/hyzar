@@ -5,6 +5,8 @@ import 'package:vibration/vibration.dart';
 import 'DetalleMedicamentoScreen.dart';
 
 class PantallaBusqueda extends StatefulWidget {
+  final String userType;
+  const PantallaBusqueda({Key? key, required this.userType}) : super(key: key);
   @override
   _PantallaBusquedaState createState() => _PantallaBusquedaState();
 }
@@ -169,6 +171,23 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
                                 : 'No suspendido')
                           ],
                         ),
+                        onTap: () {
+                          // Crear una copia del mapa de medicamentos y cambiar la clave 'codigo' a 'id'
+                          Map<String, dynamic> medicamentoConId =
+                              Map.from(medicamento);
+                          medicamentoConId['id'] =
+                              medicamentoConId.remove('codigo');
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DetalleMedicamentoScreen(
+                                medicamento: medicamentoConId,
+                                userType: widget.userType,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     );
                   }).toList(),
