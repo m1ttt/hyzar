@@ -62,6 +62,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   // Aqui son las variables de inicio de sesión
+  bool _isLoading = false;
   final Auth _auth = Auth();
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
@@ -151,6 +152,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _iniciarSesion() async {
+    setState(() {
+      _isLoading = true;
+    });
     String email = _emailController.text;
     String password = _passwordController.text;
 
@@ -193,6 +197,9 @@ class _LoginScreenState extends State<LoginScreen> {
       String errorMessage =
           "Ocurrió un error al iniciar sesión. Verifica tus credenciales.";
       _showErrorDialog(errorMessage);
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -203,9 +210,19 @@ class _LoginScreenState extends State<LoginScreen> {
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         bottom: false,
-        child: loadingBallAppear
-            ? const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 35.0),
+        child: _isLoading
+            ? const Dialog(
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(width: 20),
+                      Text("Iniciando Sesión"),
+                    ],
+                  ),
+                ),
               )
             : Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50.0),

@@ -19,7 +19,8 @@ class PrincipalUser extends StatefulWidget {
 class _PrincipalUserState extends State<PrincipalUser> {
   int _currentIndex = 0;
   String userName = "";
-  String tipoUsuario = 'usuario';
+  String tipoUsuario = '';
+  late Future<void> _loadUserTypeFuture;
 
   late List<Widget> _childrenUsuario = [
     PantallaUS(userType: tipoUsuario),
@@ -45,7 +46,6 @@ class _PrincipalUserState extends State<PrincipalUser> {
     "Pedidos",
     "Agregar",
   ];
-
   void _onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
@@ -54,21 +54,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
 
   @override
   void initState() {
-    _childrenUsuario = [
-      PantallaUS(userType: tipoUsuario),
-      PantallaBusqueda(),
-      PantallaPedidos(),
-    ];
-    _childrenAdmin = [
-      PantallaUS(
-        userType: tipoUsuario,
-      ),
-      PantallaBusqueda(),
-      PantallaPedidos(),
-      PantallaAgregar(),
-    ];
-    _loadUserType();
-    _loadUserType();
+    _loadUserTypeFuture = _loadUserType();
     super.initState();
   }
 
@@ -130,82 +116,107 @@ class _PrincipalUserState extends State<PrincipalUser> {
 
   @override
   Widget build(BuildContext context) {
-    print('Tipo de usuario: $tipoUsuario');
-    List<Widget> _children =
-        tipoUsuario == 'admin' ? _childrenAdmin : _childrenUsuario;
-    List<String> _titles =
-        tipoUsuario == 'admin' ? _titlesAdmin : _titlesUsuario;
-    List<BottomNavigationBarItem> _items = [
-      BottomNavigationBarItem(
-        icon: Icon(Icons.home),
-        label: 'Inicio',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.search),
-        label: 'Busqueda',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.insert_invitation_rounded),
-        label: 'Pedidos',
-      ),
-    ];
-    if (tipoUsuario == 'admin') {
-      _items.add(
-        BottomNavigationBarItem(
-          icon: Icon(Icons.add),
-          label: 'Agregar',
-        ),
-      );
-    }
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false, // Quitamos la flecha de retroceso
-        title: Text(_titles[_currentIndex]),
-        actions: [
-          PopupMenuButton(
-            onSelected: (value) {
-              if (value == 'cerrarSesion') {
-                _cerrarSesion();
-              }
-              if (value == 'perfil') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PantallaPerfil(user: widget.user),
-                  ),
-                );
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                const PopupMenuItem(
-                  value: 'perfil',
-                  child: Text('Perfil'),
+    return FutureBuilder(
+      future: _loadUserTypeFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          _childrenUsuario = [
+            PantallaUS(userType: tipoUsuario),
+            PantallaBusqueda(),
+            PantallaPedidos(),
+          ];
+          _childrenAdmin = [
+            PantallaUS(
+              userType: tipoUsuario,
+            ),
+            PantallaBusqueda(),
+            PantallaPedidos(),
+            PantallaAgregar(),
+          ];
+          List<Widget> _children =
+              tipoUsuario == 'admin' ? _childrenAdmin : _childrenUsuario;
+          List<String> _titles =
+              tipoUsuario == 'admin' ? _titlesAdmin : _titlesUsuario;
+          List<BottomNavigationBarItem> _items = [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Inicio',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: 'Busqueda',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.insert_invitation_rounded),
+              label: 'Pedidos',
+            ),
+          ];
+          if (tipoUsuario == 'admin') {
+            _items.add(
+              BottomNavigationBarItem(
+                icon: Icon(Icons.add),
+                label: 'Agregar',
+              ),
+            );
+          }
+          return Scaffold(
+            appBar: AppBar(
+              automaticallyImplyLeading:
+                  false, // Quitamos la flecha de retroceso
+              title: Text(_titles[_currentIndex]),
+              actions: [
+                PopupMenuButton(
+                  onSelected: (value) {
+                    if (value == 'cerrarSesion') {
+                      _cerrarSesion();
+                    }
+                    if (value == 'perfil') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              PantallaPerfil(user: widget.user),
+                        ),
+                      );
+                    }
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      const PopupMenuItem(
+                        value: 'perfil',
+                        child: Text('Perfil'),
+                      ),
+                      const PopupMenuItem(
+                        value: 'cerrarSesion',
+                        child: Text('Cerrar Sesión'),
+                      ),
+                    ];
+                  },
                 ),
-                const PopupMenuItem(
-                  value: 'cerrarSesion',
-                  child: Text('Cerrar Sesión'),
-                ),
-              ];
-            },
-          ),
-        ],
-      ),
-      body: _children[_currentIndex],
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        selectedIndex: _currentIndex,
-        destinations: _items
-            .map((item) => NavigationDestination(
-                  icon: item.icon,
-                  label: item.label ?? '',
-                ))
-            .toList(),
-      ),
+              ],
+            ),
+            body: _children[_currentIndex],
+            bottomNavigationBar: NavigationBar(
+              onDestinationSelected: (int index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              selectedIndex: _currentIndex,
+              destinations: _items
+                  .map((item) => NavigationDestination(
+                        icon: item.icon,
+                        label: item.label ?? '',
+                      ))
+                  .toList(),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error al cargar el tipo de usuario'));
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
     );
   }
 }
