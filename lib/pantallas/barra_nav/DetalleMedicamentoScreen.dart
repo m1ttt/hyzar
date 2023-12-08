@@ -20,7 +20,7 @@ class DetalleMedicamentoScreen extends StatefulWidget {
 class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
   bool mostrarDropdown = false;
   int eliminado = 0;
-  
+
   late TextEditingController nombreController;
   late TextEditingController descripcionController;
   late TextEditingController existenciasController;
@@ -145,7 +145,7 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
                         .collection('medicamentos')
                         .doc(widget.medicamento['id'])
                         .update({
-                      'nombre': nombreController.text,
+                      'nombre': capitalize(nombreController.text),
                       'descripcion': descripcionController.text,
                       'existencias': int.parse(existenciasController.text),
                       'precio_farm': double.parse(precioFarmController.text),

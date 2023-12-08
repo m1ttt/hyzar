@@ -12,6 +12,7 @@ class PantallaBusqueda extends StatefulWidget {
 class _PantallaBusquedaState extends State<PantallaBusqueda> {
   String bc_code_result = "";
   String searchText = "";
+  final TextEditingController _controller = TextEditingController();
   List<Map<String, dynamic>> medicamentosEscaneados = [];
   Future<void> obtenerDatosMedicamento(String codigo) async {
     if (codigo == "-1") {
@@ -51,6 +52,21 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
     }
   }
 
+  void _handleTextChanged() {
+    String text = _controller.text;
+    if (text.isNotEmpty && text.length < 2) {
+      _controller.text = text.toUpperCase();
+      _controller.selection = TextSelection.fromPosition(
+          TextPosition(offset: _controller.text.length));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_handleTextChanged);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,12 +77,13 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
             child: TextField(
               onChanged: (value) {
                 setState(() {
-                  searchText = value;
+                  searchText = value.length > 0
+                      ? value[0].toUpperCase() + value.substring(1)
+                      : value;
                 });
               },
               decoration: InputDecoration(
                 labelText: "Buscar medicamento",
-                hintText: "Buscar medicamento",
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
