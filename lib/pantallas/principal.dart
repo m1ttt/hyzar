@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'navigator/busqueda.dart';
-import 'navigator/inicio_us.dart';
+import 'navigator/inicio.dart';
 import 'navigator/perfil.dart';
 import 'navigator/agregar.dart';
 import 'navigator_user/pedidos/pedidos.dart';

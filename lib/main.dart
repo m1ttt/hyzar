@@ -2,6 +2,7 @@ import 'package:hyzar/utilidades/firebase_options.dart';
 import 'package:hyzar/auth/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:hyzar/main/widgets/app_theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,6 +11,29 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  Widget _buildLoading() {
+    return Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _buildError(String error) {
+    return Center(
+      child: Text('Error interno'),
+    );
+  }
+
+  Widget _buildSuccess() {
+    return MaterialApp(
+      routes: {
+        '/login': (context) => const LoginScreen(),
+      },
+      debugShowCheckedModeBanner: false,
+      theme: buildThemeData(),
+      home: const LoginScreen(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -17,37 +41,15 @@ class MyApp extends StatelessWidget {
         options: DefaultFirebaseOptions.currentPlatform,
       ),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return MaterialApp(
-            routes: {
-              '/login': (context) => const LoginScreen(),
-            },
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSwatch(
-                primarySwatch:
-                    Colors.blue, // Cambia a tu color principal deseado aquí
-              ).copyWith(
-                secondary:
-                    Colors.blue, // Cambia a tu color secundario deseado aquí
-                surface: Colors.white, // Cambia el color de la superficie aquí
-                background: Colors.white, // Cambia el color de fondo aquí
-              ),
-              brightness: Brightness.light, // Set light theme
-              scaffoldBackgroundColor:
-                  Colors.white, // Set background color to white
-              typography: Typography.material2021(), // Set typography
-              useMaterial3: true,
-            ),
-            home: const LoginScreen(),
-          );
-        }
-
         if (snapshot.hasError) {
-          return Center(child: Text('Error al inicializar Firebase'));
+          return _buildError(snapshot.error.toString());
         }
 
-        return Center(child: CircularProgressIndicator());
+        if (snapshot.connectionState == ConnectionState.done) {
+          return _buildSuccess();
+        }
+
+        return _buildLoading();
       },
     );
   }

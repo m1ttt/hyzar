@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vibration/vibration.dart';
-import 'DetalleMedicamentoScreen.dart';
+import 'detalle_medicamento.dart';
 
 class PantallaBusqueda extends StatefulWidget {
   final String userType;

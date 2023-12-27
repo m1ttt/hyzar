@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/funciones/pedido.dart';
-import 'DetalleMedicamentoScreen.dart';
+import 'detalle_medicamento.dart';
 
 class PantallaUS extends StatefulWidget {
   final String userType;
