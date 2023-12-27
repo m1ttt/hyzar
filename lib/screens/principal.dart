@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'barra_nav/busqueda.dart';
-import 'barra_nav/inicio_us.dart';
-import 'barra_nav/perfil.dart';
-import 'barra_nav/agregar.dart';
-import 'barra_nav_us/pedidos.dart';
+import 'navigator/busqueda.dart';
+import 'navigator/inicio_us.dart';
+import 'navigator/perfil.dart';
+import 'navigator/agregar.dart';
+import 'navigator_user/pedidos/pedidos.dart';
 
 class PrincipalUser extends StatefulWidget {
   final User user;

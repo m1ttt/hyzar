@@ -1,5 +1,5 @@
 import 'package:hyzar/firebase_options.dart';
-import 'package:hyzar/pantallas/login.dart';
+import 'package:hyzar/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 

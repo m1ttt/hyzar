@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hyzar/screens/navigator_user/pedidos/funciones/pedido.dart';
 import 'DetalleMedicamentoScreen.dart';
 
 class PantallaUS extends StatefulWidget {
@@ -23,7 +24,7 @@ class _PantallaUSState extends State<PantallaUS>
   bool _showLabel = true;
 
   void _toggleSelection(String itemId) {
-    if (widget.userType == 'usuari') {
+    if (widget.userType == 'usuario') {
       if (_selectedItems.contains(itemId)) {
         _selectedItems.remove(itemId);
       } else {
@@ -170,53 +171,68 @@ class _PantallaUSState extends State<PantallaUS>
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text('Ordenar'), // Agregado un label "Ordenar"
-        onPressed: () {
-          final RenderBox renderBox = context.findRenderObject() as RenderBox;
-          final size = renderBox.size;
-          final offset = renderBox.localToGlobal(Offset.zero);
-          showMenu(
-            context: context,
-            position: RelativeRect.fromLTRB(
-              offset.dx,
-              offset.dy + size.height,
-              offset.dx + size.width,
-              offset.dy,
-            ),
-            items: [
-              PopupMenuItem(
-                value: 1,
-                child: Text("Ordenar por nombre o existencias"),
-              ),
-              PopupMenuItem(
-                value: 2,
-                child: Text("Ver suspendidos"),
-              ),
-              PopupMenuItem(
-                value: 3,
-                child: Text("Ver no suspendidos"),
-              ),
-            ],
-          ).then((value) {
-            if (value != null) {
-              setState(() {
-                switch (value) {
-                  case 1:
-                    ordenarPorNombre = !ordenarPorNombre;
-                    break;
-                  case 2:
-                    mostrarSoloEliminados = true;
-                    break;
-                  case 3:
-                    mostrarSoloEliminados = false;
-                    break;
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          if (_selectedItems.isNotEmpty)
+            FloatingActionButton.extended(
+                onPressed: () async {
+                  List<String> ids = _selectedItems.toList();
+                  List<DocumentSnapshot> datosPedidos = await obtenerDatosDePedidos(ids);
+                },
+                label: Text("Crear pedido"),
+                icon: Icon(Icons.add_shopping_cart)),
+          SizedBox(height: 10), // Cambiado width a height
+          FloatingActionButton.extended(
+            label: Text('Ordenar'), // Agregado un label "Ordenar"
+            onPressed: () {
+              final RenderBox renderBox =
+                  context.findRenderObject() as RenderBox;
+              final size = renderBox.size;
+              final offset = renderBox.localToGlobal(Offset.zero);
+              showMenu(
+                context: context,
+                position: RelativeRect.fromLTRB(
+                  offset.dx,
+                  offset.dy + size.height,
+                  offset.dx + size.width,
+                  offset.dy,
+                ),
+                items: [
+                  PopupMenuItem(
+                    value: 1,
+                    child: Text("Ordenar por nombre o existencias"),
+                  ),
+                  PopupMenuItem(
+                    value: 2,
+                    child: Text("Ver suspendidos"),
+                  ),
+                  PopupMenuItem(
+                    value: 3,
+                    child: Text("Ver no suspendidos"),
+                  ),
+                ],
+              ).then((value) {
+                if (value != null) {
+                  setState(() {
+                    switch (value) {
+                      case 1:
+                        ordenarPorNombre = !ordenarPorNombre;
+                        break;
+                      case 2:
+                        mostrarSoloEliminados = true;
+                        break;
+                      case 3:
+                        mostrarSoloEliminados = false;
+                        break;
+                    }
+                  });
                 }
               });
-            }
-          });
-        },
-        icon: Icon(Icons.sort),
+            },
+            icon: Icon(Icons.sort),
+          ),
+        ],
       ),
     );
   }
