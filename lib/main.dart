@@ -3,22 +3,29 @@ import 'package:hyzar/auth/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hyzar/main/widgets/app_theme.dart';
+import 'package:hyzar/utilidades/backend/user_notifier.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => UserNotifier('',''),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   Widget _buildLoading() {
-    return Center(
+    return const Center(
       child: CircularProgressIndicator(),
     );
   }
 
   Widget _buildError(String error) {
-    return Center(
+    return const Center(
       child: Text('Error interno'),
     );
   }

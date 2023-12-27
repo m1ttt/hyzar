@@ -2,11 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/funciones/pedido.dart';
+import 'package:hyzar/utilidades/backend/user_notifier.dart';
+import 'package:provider/provider.dart';
 import 'detalle_medicamento.dart';
 
 class PantallaUS extends StatefulWidget {
-  final String userType;
-  const PantallaUS({Key? key, required this.userType}) : super(key: key);
+  const PantallaUS({Key? key}) : super(key: key);
 
   @override
   _PantallaUSState createState() => _PantallaUSState();
@@ -14,6 +15,8 @@ class PantallaUS extends StatefulWidget {
 
 class _PantallaUSState extends State<PantallaUS>
     with SingleTickerProviderStateMixin {
+  late String userType;
+  late String email;
   bool ordenarPorNombre = true;
   bool mostrarSoloEliminados = false;
   late AnimationController _animationController;
@@ -24,7 +27,7 @@ class _PantallaUSState extends State<PantallaUS>
   bool _showLabel = true;
 
   void _toggleSelection(String itemId) {
-    if (widget.userType == 'usuario') {
+    if (userType == 'usuario') {
       if (_selectedItems.contains(itemId)) {
         _selectedItems.remove(itemId);
       } else {
@@ -34,10 +37,15 @@ class _PantallaUSState extends State<PantallaUS>
     }
   }
 
+  void initUserType() async {
+    userType = Provider.of<UserNotifier>(context, listen: false).getUserType();
+    email = Provider.of<UserNotifier>(context, listen: false).getEmail();
+  }
+
   @override
   void initState() {
     super.initState();
-
+    initUserType();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
@@ -135,19 +143,19 @@ class _PantallaUSState extends State<PantallaUS>
                         context,
                         MaterialPageRoute(
                           builder: (context) => DetalleMedicamentoScreen(
-                              userType: widget.userType, medicamento: data),
+                              userType: userType, medicamento: data),
                         ),
                       );
                     },
                     onLongPress: () {
-                      if (widget.userType == 'usuario') {
+                      if (userType == 'usuario') {
                         setState(() {
                           _toggleSelection(data['id']);
                         });
                       }
                     },
                     child: Hero(
-                      tag: 'detalle${data['id']}',
+                      tag: 'detalle${data['id']}$index',
                       child: Container(
                         margin: const EdgeInsets.all(5.0),
                         color: _selectedItems.contains(data['id'])
@@ -176,14 +184,17 @@ class _PantallaUSState extends State<PantallaUS>
         children: <Widget>[
           if (_selectedItems.isNotEmpty)
             FloatingActionButton.extended(
+                heroTag: "FAB1",
                 onPressed: () async {
                   List<String> ids = _selectedItems.toList();
-                  List<DocumentSnapshot> datosPedidos = await obtenerDatosDePedidos(ids);
+                  List<DocumentSnapshot> datosPedidos =
+                      await obtenerDatosDePedidos(ids);
                 },
                 label: Text("Crear pedido"),
                 icon: Icon(Icons.add_shopping_cart)),
           SizedBox(height: 10), // Cambiado width a height
           FloatingActionButton.extended(
+            heroTag: "FAB2",
             label: Text('Ordenar'), // Agregado un label "Ordenar"
             onPressed: () {
               final RenderBox renderBox =

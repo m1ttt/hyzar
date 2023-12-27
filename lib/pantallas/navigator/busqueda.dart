@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:hyzar/utilidades/backend/user_notifier.dart';
+import 'package:provider/provider.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vibration/vibration.dart';
 import 'detalle_medicamento.dart';
 
 class PantallaBusqueda extends StatefulWidget {
-  final String userType;
-  const PantallaBusqueda({Key? key, required this.userType}) : super(key: key);
+  const PantallaBusqueda({Key? key}) : super(key: key);
+
   @override
   _PantallaBusquedaState createState() => _PantallaBusquedaState();
 }
 
 class _PantallaBusquedaState extends State<PantallaBusqueda> {
+  late String userType;
+  late String email;
+
   String bc_code_result = "";
   String searchText = "";
   final TextEditingController _controller = TextEditingController();
@@ -63,9 +68,15 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
     }
   }
 
+  void initUserType() async {
+    userType = Provider.of<UserNotifier>(context, listen: false).getUserType();
+    email = Provider.of<UserNotifier>(context, listen: false).getEmail();
+  }
+
   @override
   void initState() {
     super.initState();
+    initUserType();
     _controller.addListener(_handleTextChanged);
   }
 
@@ -182,9 +193,8 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => DetalleMedicamentoScreen(
-                                medicamento: medicamentoConId,
-                                userType: widget.userType,
-                              ),
+                                  medicamento: medicamentoConId,
+                                  userType: userType),
                             ),
                           );
                         },

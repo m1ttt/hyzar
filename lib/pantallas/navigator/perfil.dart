@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class PantallaPerfil extends StatefulWidget {
-  final User user;
-
-  PantallaPerfil({required this.user});
-
   @override
   _PantallaPerfilState createState() => _PantallaPerfilState();
 }
@@ -15,31 +11,31 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
   final _passwordController = TextEditingController();
   bool _estaEditando = false;
 
-  void _actualizarPerfil() async {
-    try {
-      await widget.user.updateEmail(_emailController.text);
-      await widget.user.updatePassword(_passwordController.text);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Perfil actualizado con éxito'),
-        ),
-      );
-      setState(() {
-        _estaEditando = false;
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al actualizar el perfil: $e'),
-        ),
-      );
-    }
-  }
+  // void _actualizarPerfil() async {
+  //   try {
+  //     await widget.user.updateEmail(_emailController.text);
+  //     await widget.user.updatePassword(_passwordController.text);
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Perfil actualizado con éxito'),
+  //       ),
+  //     );
+  //     setState(() {
+  //       _estaEditando = false;
+  //     });
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Error al actualizar el perfil: $e'),
+  //       ),
+  //     );
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
-    _emailController.text = widget.user.email ?? '';
+    // _emailController.text = widget.user.email ?? '';
   }
 
   @override
@@ -52,7 +48,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
             icon: Icon(_estaEditando ? Icons.check : Icons.edit),
             onPressed: () {
               if (_estaEditando) {
-                _actualizarPerfil();
+                // _actualizarPerfil();
               } else {
                 setState(() {
                   _estaEditando = true;
@@ -75,7 +71,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                         hintText: 'Correo del usuario',
                       ),
                     )
-                  : Text(widget.user.email ?? ''),
+                  : Text(''),
             ),
           ),
           if (_estaEditando)

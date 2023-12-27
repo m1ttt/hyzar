@@ -1,6 +1,10 @@
+import 'dart:ffi';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:hyzar/utilidades/backend/user_notifier.dart';
+import 'package:provider/provider.dart';
 import 'navigator/busqueda.dart';
 import 'navigator/inicio.dart';
 import 'navigator/perfil.dart';
@@ -8,8 +12,9 @@ import 'navigator/agregar.dart';
 import 'navigator_user/pedidos/pedidos.dart';
 
 class PrincipalUser extends StatefulWidget {
-  final User user;
-  const PrincipalUser({super.key, required this.user});
+  const PrincipalUser({
+    super.key,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -18,25 +23,19 @@ class PrincipalUser extends StatefulWidget {
 
 class _PrincipalUserState extends State<PrincipalUser> {
   int _currentIndex = 0;
-  String userName = "";
-  String tipoUsuario = '';
   late Future<void> _loadUserTypeFuture;
+  late String tipoUsuario;
+  late String email;
 
   late List<Widget> _childrenUsuario = [
-    PantallaUS(userType: tipoUsuario),
-    PantallaBusqueda(
-      userType: tipoUsuario,
-    ),
-    PantallaPedidos(),
+    PantallaUS(),
+    PantallaBusqueda(),
+    const PantallaPedidos(),
   ];
   late List<Widget> _childrenAdmin = [
-    PantallaUS(
-      userType: tipoUsuario,
-    ),
-    PantallaBusqueda(
-      userType: tipoUsuario,
-    ),
-    PantallaPedidos(),
+    PantallaUS(),
+    PantallaBusqueda(),
+    const PantallaPedidos(),
     PantallaAgregar(),
   ];
   final List<String> _titlesUsuario = ["Productos", "Búsqueda", "Pedidos"];
@@ -46,11 +45,6 @@ class _PrincipalUserState extends State<PrincipalUser> {
     "Pedidos",
     "Agregar",
   ];
-  void _onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
 
   @override
   void initState() {
@@ -59,25 +53,9 @@ class _PrincipalUserState extends State<PrincipalUser> {
   }
 
   Future<void> _loadUserType() async {
-    try {
-      User? currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser != null) {
-        String userID = currentUser.uid;
-        DatabaseReference userRef =
-            FirebaseDatabase.instance.ref().child("usuarios").child(userID);
-        DatabaseEvent snapshot = await userRef.once();
-        Map<dynamic, dynamic>? userData =
-            snapshot.snapshot.value as Map<dynamic, dynamic>?;
-        if (userData != null && userData["tipo"] != null) {
-          setState(() {
-            tipoUsuario = userData["tipo"];
-            _currentIndex = 0; // Restablecer el índice a 0
-          });
-        }
-      }
-    } catch (e) {
-      print("Error al cargar el tipo de usuario: $e");
-    }
+    tipoUsuario =
+        Provider.of<UserNotifier>(context, listen: false).getUserType();
+    email = Provider.of<UserNotifier>(context, listen: false).getEmail();
   }
 
   void _cerrarSesion() async {
@@ -101,9 +79,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
                 // ignore: use_build_context_synchronously
                 Navigator.pushNamedAndRemoveUntil(
                     context, '/login', (Route<dynamic> route) => false);
-                print("Sesión cerrada correctamente");
               } catch (e) {
-                print("Error al cerrar sesión: $e");
                 // Aquí puedes manejar cualquier error que pueda ocurrir al cerrar sesión
               }
             },
@@ -116,48 +92,42 @@ class _PrincipalUserState extends State<PrincipalUser> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<void>(
       future: _loadUserTypeFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           _childrenUsuario = [
-            PantallaUS(userType: tipoUsuario),
-            PantallaBusqueda(
-              userType: tipoUsuario,
-            ),
-            PantallaPedidos(),
+            PantallaUS(),
+            PantallaBusqueda(),
+            const PantallaPedidos(),
           ];
           _childrenAdmin = [
-            PantallaUS(
-              userType: tipoUsuario,
-            ),
-            PantallaBusqueda(
-              userType: tipoUsuario,
-            ),
-            PantallaPedidos(),
+            PantallaUS(),
+            PantallaBusqueda(),
+            const PantallaPedidos(),
             PantallaAgregar(),
           ];
-          List<Widget> _children =
+          List<Widget> children =
               tipoUsuario == 'admin' ? _childrenAdmin : _childrenUsuario;
-          List<String> _titles =
+          List<String> titles =
               tipoUsuario == 'admin' ? _titlesAdmin : _titlesUsuario;
-          List<BottomNavigationBarItem> _items = [
-            BottomNavigationBarItem(
+          List<BottomNavigationBarItem> items = [
+            const BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Inicio',
             ),
-            BottomNavigationBarItem(
+            const BottomNavigationBarItem(
               icon: Icon(Icons.search),
               label: 'Busqueda',
             ),
-            BottomNavigationBarItem(
+            const BottomNavigationBarItem(
               icon: Icon(Icons.insert_invitation_rounded),
               label: 'Pedidos',
             ),
           ];
           if (tipoUsuario == 'admin') {
-            _items.add(
-              BottomNavigationBarItem(
+            items.add(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.add),
                 label: 'Agregar',
               ),
@@ -167,7 +137,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
             appBar: AppBar(
               automaticallyImplyLeading:
                   false, // Quitamos la flecha de retroceso
-              title: Text(_titles[_currentIndex]),
+              title: Text(titles[_currentIndex]),
               actions: [
                 PopupMenuButton(
                   onSelected: (value) {
@@ -178,8 +148,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              PantallaPerfil(user: widget.user),
+                          builder: (context) => PantallaPerfil(),
                         ),
                       );
                     }
@@ -199,7 +168,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
                 ),
               ],
             ),
-            body: _children[_currentIndex],
+            body: children[_currentIndex],
             bottomNavigationBar: NavigationBar(
               onDestinationSelected: (int index) {
                 setState(() {
@@ -207,7 +176,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
                 });
               },
               selectedIndex: _currentIndex,
-              destinations: _items
+              destinations: items
                   .map((item) => NavigationDestination(
                         icon: item.icon,
                         label: item.label ?? '',
@@ -216,9 +185,10 @@ class _PrincipalUserState extends State<PrincipalUser> {
             ),
           );
         } else if (snapshot.hasError) {
-          return Center(child: Text('Error al cargar el tipo de usuario'));
+          return const Center(
+              child: Text('Error al cargar el tipo de usuario'));
         } else {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
       },
     );

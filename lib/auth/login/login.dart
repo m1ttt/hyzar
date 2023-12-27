@@ -11,6 +11,8 @@ import 'package:flutter/cupertino.dart'; // Importa CupertinoAlertDialog para iO
 import 'package:hyzar/auth/login/widgets/email_field.dart';
 import 'package:hyzar/auth/login/widgets/get_started_button.dart';
 import 'package:hyzar/auth/login/widgets/password_field.dart';
+import 'package:hyzar/utilidades/backend/user_notifier.dart';
+import 'package:provider/provider.dart';
 import '../register/registro.dart';
 
 class Login extends StatelessWidget {
@@ -79,14 +81,14 @@ class _LoginScreenState extends State<LoginScreen> {
           if (userData != null && userData["tipo"] == "usuario") {
             // El usuario es un usuario normal
             print("Es un usuario");
-            Navigator.push(context,
-                SlideFromRightPageRoute(enterPage: PrincipalUser(user: user)));
+            Navigator.push(
+                context, SlideFromRightPageRoute(enterPage: PrincipalUser()));
             // Aquí puedes realizar acciones específicas para los usuarios normales
           } else if (userData != null && userData["tipo"] == "admin") {
             // El usuario es un administrador
             print("Es un administrador");
-            Navigator.push(context,
-                SlideFromRightPageRoute(enterPage: PrincipalUser(user: user)));
+            Navigator.push(
+                context, SlideFromRightPageRoute(enterPage: PrincipalUser()));
 
             // Aquí puedes realizar acciones específicas para los administradores
           } else {
@@ -168,14 +170,22 @@ class _LoginScreenState extends State<LoginScreen> {
         if (userData != null && userData["tipo"] == "usuario") {
           // El usuario es un usuario normal
           print("Es un usuario");
-          Navigator.push(context,
-              SlideFromRightPageRoute(enterPage: PrincipalUser(user: user)));
+          Provider.of<UserNotifier>(context, listen: false)
+              .setEmail(user.email!);
+          Provider.of<UserNotifier>(context, listen: false)
+              .setUserType(userData["tipo"]);
+          Navigator.push(
+              context, SlideFromRightPageRoute(enterPage: PrincipalUser()));
           // Aquí puedes realizar acciones específicas para los usuarios normales
         } else if (userData != null && userData["tipo"] == "admin") {
           // El usuario es un administrador
           print("Es un administrador");
-          Navigator.push(context,
-              SlideFromRightPageRoute(enterPage: PrincipalUser(user: user)));
+          Provider.of<UserNotifier>(context, listen: false)
+              .setEmail(user.email!);
+          Provider.of<UserNotifier>(context, listen: false)
+              .setUserType(userData["tipo"]);
+          Navigator.push(
+              context, SlideFromRightPageRoute(enterPage: PrincipalUser()));
 
           // Aquí puedes realizar acciones específicas para los administradores
         } else {
