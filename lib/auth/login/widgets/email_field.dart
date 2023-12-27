@@ -1,4 +1,4 @@
-import 'package:hyzar/styles/colors.dart';
+import 'package:hyzar/estilos/colors.dart';
 import 'package:flutter/material.dart';
 
 class EmailField extends StatefulWidget {

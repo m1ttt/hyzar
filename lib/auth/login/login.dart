@@ -5,13 +5,13 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:hyzar/screens/principal.dart';
+import 'package:hyzar/pantallas/principal.dart';
 import 'package:hyzar/utilidades/auth.dart';
 import 'package:flutter/cupertino.dart'; // Importa CupertinoAlertDialog para iOS
-import 'package:hyzar/presentation/email_field.dart';
-import 'package:hyzar/presentation/get_started_button.dart';
-import 'package:hyzar/presentation/password_field.dart';
-import 'registro.dart';
+import 'package:hyzar/auth/login/widgets/email_field.dart';
+import 'package:hyzar/auth/login/widgets/get_started_button.dart';
+import 'package:hyzar/auth/login/widgets/password_field.dart';
+import '../register/registro.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
