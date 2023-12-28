@@ -160,6 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
       print("Hola, ${user.email}! Inicio de sesión exitoso.");
       // Verificar el tipo de usuario (usuario o admin)
       String userID = user.uid;
+      Provider.of<UserNotifier>(context, listen: false).setUserID(userID);
       DatabaseReference userRef =
           FirebaseDatabase.instance.ref().child("usuarios").child(userID);
       DataSnapshot snapshot = (await userRef.once()).snapshot;

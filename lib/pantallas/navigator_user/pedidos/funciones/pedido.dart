@@ -7,7 +7,6 @@ Future<List<DocumentSnapshot>> obtenerDatosDePedidos(List<String> ids) async {
     final doc = await firestore.collection('medicamentos').doc(id).get();
     if (doc.exists) {
       documentos.add(doc);
-      print(doc.data());
     }
   }
 

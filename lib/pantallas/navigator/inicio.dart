@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/funciones/pedido.dart';
+import 'package:hyzar/pantallas/navigator_user/pedidos/pedidos_confirm.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
 import 'detalle_medicamento.dart';
@@ -19,8 +20,7 @@ class _PantallaUSState extends State<PantallaUS>
   late String email;
   bool ordenarPorNombre = true;
   bool mostrarSoloEliminados = false;
-  late AnimationController _animationController;
-  late Animation<double> _animation;
+
   final ScrollController _scrollController = ScrollController();
   final Set<String> _selectedItems =
       Set<String>(); // Nuevo: para almacenar los elementos seleccionados
@@ -46,38 +46,10 @@ class _PantallaUSState extends State<PantallaUS>
   void initState() {
     super.initState();
     initUserType();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    );
-
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.fastOutSlowIn,
-    );
-
-    _animationController.forward();
-
-    _scrollController.addListener(() {
-      if (_scrollController.offset <=
-              _scrollController.position.minScrollExtent &&
-          !_scrollController.position.outOfRange) {
-        setState(() {
-          _showLabel = true;
-        });
-      } else {
-        if (_showLabel == true) {
-          setState(() {
-            _showLabel = false;
-          });
-        }
-      }
-    });
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
     super.dispose();
   }
 
@@ -117,63 +89,66 @@ class _PantallaUSState extends State<PantallaUS>
                 ),
               );
             }
-            return ListView.builder(
-              controller: _scrollController,
-              itemCount: snapshot.data!.docs.length,
-              itemBuilder: (context, index) {
-                DocumentSnapshot document = snapshot.data!.docs[index];
-                Map<String, dynamic> data =
-                    document.data() as Map<String, dynamic>;
-                data['id'] = document.id;
-                int existencias = int.parse(data['existencias'].toString());
-                Color color = Color.lerp(
-                  Colors.red,
-                  Colors.green,
-                  existencias /
-                      100, // Asume que 100 es el máximo de existencias
-                )!;
-                if (mostrarSoloEliminados && data['eliminado'] == 0) {
-                  return Container(height: 0, width: 0);
-                } else if (!mostrarSoloEliminados && data['eliminado'] == 1) {
-                  return Container(height: 0, width: 0);
-                } else {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetalleMedicamentoScreen(
-                              userType: userType, medicamento: data),
-                        ),
-                      );
-                    },
-                    onLongPress: () {
-                      if (userType == 'usuario') {
-                        setState(() {
-                          _toggleSelection(data['id']);
-                        });
-                      }
-                    },
-                    child: Hero(
-                      tag: 'detalle${data['id']}$index',
-                      child: Container(
-                        margin: const EdgeInsets.all(5.0),
-                        color: _selectedItems.contains(data['id'])
-                            ? Colors.blue
-                            : null,
-                        child: Card(
-                          color: color,
-                          child: ListTile(
-                            leading: Icon(Icons.medication, size: 60),
-                            title: Text('${data['nombre']}'),
-                            subtitle:
-                                Text('Existencias: ${data['existencias']}'),
-                          ),
+
+            // Mueve la lógica de construcción del widget fuera del StreamBuilder
+            List<Widget> children = snapshot.data!.docs.map((document) {
+              Map<String, dynamic> data =
+                  document.data() as Map<String, dynamic>;
+              data['id'] = document.id;
+              int existencias = int.parse(data['existencias'].toString());
+              Color color = Color.lerp(
+                Colors.red,
+                Colors.green,
+                existencias / 100, // Asume que 100 es el máximo de existencias
+              )!;
+              if (mostrarSoloEliminados && data['eliminado'] == 0) {
+                return Container(height: 0, width: 0);
+              } else if (!mostrarSoloEliminados && data['eliminado'] == 1) {
+                return Container(height: 0, width: 0);
+              } else {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetalleMedicamentoScreen(
+                            userType: userType, medicamento: data),
+                      ),
+                    );
+                  },
+                  onLongPress: () {
+                    if (userType == 'usuario') {
+                      setState(() {
+                        _toggleSelection(data['id']);
+                      });
+                    }
+                  },
+                  child: Hero(
+                    tag: 'detalle${data['id']}',
+                    child: Container(
+                      margin: const EdgeInsets.all(5.0),
+                      color: _selectedItems.contains(data['id'])
+                          ? Colors.blue
+                          : null,
+                      child: Card(
+                        color: color,
+                        child: ListTile(
+                          leading: Icon(Icons.medication, size: 60),
+                          title: Text('${data['nombre']}'),
+                          subtitle: Text('Existencias: ${data['existencias']}'),
                         ),
                       ),
                     ),
-                  );
-                }
+                  ),
+                );
+              }
+            }).toList();
+
+            return ListView.builder(
+              controller: _scrollController,
+              itemCount: children.length,
+              itemBuilder: (context, index) {
+                return children[index];
               },
             );
           },
@@ -189,6 +164,13 @@ class _PantallaUSState extends State<PantallaUS>
                   List<String> ids = _selectedItems.toList();
                   List<DocumentSnapshot> datosPedidos =
                       await obtenerDatosDePedidos(ids);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          PantallaPedidosConfirm(documentos: datosPedidos),
+                    ),
+                  );
                 },
                 label: Text("Crear pedido"),
                 icon: Icon(Icons.add_shopping_cart)),
