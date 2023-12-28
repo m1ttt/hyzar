@@ -1,3 +1,5 @@
+//TODO: MANDARLO A TODO A PEDIDOS, YA ESTA EL JSON, MANDARLO A FIRESTORE Y CON SU ESTATUS.
+
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -166,7 +168,7 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
                           'pedidoId':
                               'simulated_order_id', // Simula el ID del pedido
                           'detalles': {
-                            'userId': userId, // Agrega el userId al pedido
+                            'userID': userId, // Agrega el userId al pedido
                             'productos': productos,
                             'total': total,
                             'fechaActual': DateFormat("yyyy-MM-dd HH:mm")
