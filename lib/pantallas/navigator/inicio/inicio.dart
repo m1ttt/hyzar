@@ -1,11 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/funciones/pedido.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/pedidos_confirm.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
-import 'detalle_medicamento.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../detalle_medicamento.dart';
 
 class PantallaUS extends StatefulWidget {
   const PantallaUS({Key? key}) : super(key: key);
@@ -22,9 +24,7 @@ class _PantallaUSState extends State<PantallaUS>
   bool mostrarSoloEliminados = false;
 
   final ScrollController _scrollController = ScrollController();
-  final Set<String> _selectedItems =
-      Set<String>(); // Nuevo: para almacenar los elementos seleccionados
-  bool _showLabel = true;
+  final Set<String> _selectedItems = <String>{};
 
   void _toggleSelection(String itemId) {
     if (userType == 'usuario') {
@@ -74,11 +74,11 @@ class _PantallaUSState extends State<PantallaUS>
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
-              return Text('Algo salió mal');
+              return const Text('Algo salió mal');
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
+              return const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -90,7 +90,6 @@ class _PantallaUSState extends State<PantallaUS>
               );
             }
 
-            // Mueve la lógica de construcción del widget fuera del StreamBuilder
             List<Widget> children = snapshot.data!.docs.map((document) {
               Map<String, dynamic> data =
                   document.data() as Map<String, dynamic>;
@@ -133,7 +132,18 @@ class _PantallaUSState extends State<PantallaUS>
                       child: Card(
                         color: color,
                         child: ListTile(
-                          leading: Icon(Icons.medication, size: 60),
+                          leading:
+                              (data['imagen'] == null || data['imagen'] == '')
+                                  ? Icon(Icons.warning, size: 60)
+                                  : CachedNetworkImage(
+                                      imageUrl: data['imagen'],
+                                      width: 60,
+                                      height: 60,
+                                      placeholder: (context, url) =>
+                                          CircularProgressIndicator(),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(Icons.error),
+                                    ),
                           title: Text('${data['nombre']}'),
                           subtitle: Text('Existencias: ${data['existencias']}'),
                         ),
@@ -159,25 +169,31 @@ class _PantallaUSState extends State<PantallaUS>
         children: <Widget>[
           if (_selectedItems.isNotEmpty)
             FloatingActionButton.extended(
-                heroTag: "FAB1",
-                onPressed: () async {
-                  List<String> ids = _selectedItems.toList();
-                  List<DocumentSnapshot> datosPedidos =
-                      await obtenerDatosDePedidos(ids);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          PantallaPedidosConfirm(documentos: datosPedidos),
-                    ),
-                  );
-                },
-                label: Text("Crear pedido"),
-                icon: Icon(Icons.add_shopping_cart)),
-          SizedBox(height: 10), // Cambiado width a height
+              heroTag: "FAB1",
+              onPressed: () async {
+                List<String> ids = _selectedItems.toList();
+                List<DocumentSnapshot> datosPedidos =
+                    await obtenerDatosDePedidos(ids);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PantallaPedidosConfirm(documentos: datosPedidos),
+                  ),
+                ).then((_) {
+                  // Limpia _selectedItems después de navegar a PantallaPedidosConfirm
+                  setState(() {
+                    _selectedItems.clear();
+                  });
+                });
+              },
+              label: const Text("Crear pedido"),
+              icon: const Icon(Icons.add_shopping_cart),
+            ),
+          const SizedBox(height: 10), // Cambiado width a height
           FloatingActionButton.extended(
             heroTag: "FAB2",
-            label: Text('Ordenar'), // Agregado un label "Ordenar"
+            label: const Text('Ordenar'), // Agregado un label "Ordenar"
             onPressed: () {
               final RenderBox renderBox =
                   context.findRenderObject() as RenderBox;
@@ -192,15 +208,15 @@ class _PantallaUSState extends State<PantallaUS>
                   offset.dy,
                 ),
                 items: [
-                  PopupMenuItem(
+                  const PopupMenuItem(
                     value: 1,
                     child: Text("Ordenar por nombre o existencias"),
                   ),
-                  PopupMenuItem(
+                  const PopupMenuItem(
                     value: 2,
                     child: Text("Ver suspendidos"),
                   ),
-                  PopupMenuItem(
+                  const PopupMenuItem(
                     value: 3,
                     child: Text("Ver no suspendidos"),
                   ),
@@ -223,7 +239,7 @@ class _PantallaUSState extends State<PantallaUS>
                 }
               });
             },
-            icon: Icon(Icons.sort),
+            icon: const Icon(Icons.sort),
           ),
         ],
       ),

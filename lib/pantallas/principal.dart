@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
 import 'navigator/busqueda.dart';
-import 'navigator/inicio.dart';
+import 'navigator/inicio/inicio.dart';
 import 'navigator/perfil.dart';
 import 'navigator/agregar.dart';
 import 'navigator_user/pedidos/pedidos.dart';

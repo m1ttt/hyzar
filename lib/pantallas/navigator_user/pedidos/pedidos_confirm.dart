@@ -1,16 +1,18 @@
 //TODO: MANDARLO A TODO A PEDIDOS, YA ESTA EL JSON, MANDARLO A FIRESTORE Y CON SU ESTATUS.
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hyzar/pantallas/navigator_user/pedidos/pedido_ubicacion.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:intl/intl.dart';
-import 'dart:convert';
+import 'package:uuid/uuid.dart';
 
 import 'package:provider/provider.dart';
 
 class PantallaPedidosConfirm extends StatefulWidget {
-  final List<DocumentSnapshot> documentos;
+  List<DocumentSnapshot> documentos;
 
   PantallaPedidosConfirm({required this.documentos});
 
@@ -19,6 +21,7 @@ class PantallaPedidosConfirm extends StatefulWidget {
 }
 
 class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
+  ScrollController _scrollController = ScrollController();
   List<int> contador = [];
   TextEditingController fechaPedidoController = TextEditingController();
 
@@ -45,6 +48,7 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
       body: Padding(
         padding: EdgeInsets.all(10.0),
         child: ListView.builder(
+          controller: _scrollController,
           itemCount: widget.documentos.length + 1,
           itemBuilder: (context, index) {
             if (index < widget.documentos.length) {
@@ -53,12 +57,16 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
               return Card(
                 child: ListTile(
                   leading: data['imagen'] != null && data['imagen'].isNotEmpty
-                      ? Image.network(
-                          data['imagen'],
+                      ? CachedNetworkImage(
+                          imageUrl: data['imagen'],
                           width: 50, // Ancho de la imagen
                           height: 50, // Altura de la imagen
                           fit: BoxFit
                               .cover, // Para mantener la relación de aspecto de la imagen
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
                         )
                       : Icon(Icons.warning, color: Colors.red),
                   title: Text(data['nombre']),
@@ -68,9 +76,20 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
                     children: [
                       IconButton(
                         icon: Icon(Icons.remove),
-                        onPressed: contador[index] > 1
-                            ? () => setState(() => contador[index]--)
-                            : null,
+                        onPressed: () {
+                          setState(() {
+                            contador[index]--;
+                            if (contador[index] == 0) {
+                              // Convierte las listas a listas de longitud variable si aún no lo son
+                              widget.documentos = List.from(widget.documentos);
+                              contador = List.from(contador);
+
+                              // Ahora puedes eliminar elementos de las listas
+                              widget.documentos.removeAt(index);
+                              contador.removeAt(index);
+                            }
+                          });
+                        },
                       ),
                       Text('${contador[index]}'),
                       IconButton(
@@ -154,27 +173,23 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
                             Provider.of<UserNotifier>(context, listen: false)
                                 .getUserID();
 
-                        List<Map<String, dynamic>> productos =
-                            List.generate(widget.documentos.length, (index) {
-                          final doc = widget.documentos[index];
-                          final data = doc.data() as Map<String, dynamic>;
-                          return {
-                            'id': doc.id,
-                            'cantidad': contador[index],
-                          };
-                        });
+                        Map<String, dynamic> productos = {
+                          for (int index = 0;
+                              index < widget.documentos.length;
+                              index++)
+                            widget.documentos[index].id: {
+                              'cantidad': contador[index],
+                              'nombre': (widget.documentos[index].data()
+                                  as Map<String, dynamic>)['nombre'],
+                            }
+                        };
 
-                        Map<String, dynamic> pedido = {
-                          'pedidoId':
-                              'simulated_order_id', // Simula el ID del pedido
-                          'detalles': {
-                            'userID': userId, // Agrega el userId al pedido
-                            'productos': productos,
-                            'total': total,
-                            'fechaActual': DateFormat("yyyy-MM-dd HH:mm")
-                                .format(DateTime.now()),
-                            'fechaPedido': fechaPedidoController.text,
-                          }
+                        Map<String, dynamic> detallesPedido = {
+                          'productos': productos,
+                          'total': total,
+                          'fechaActual': DateFormat("yyyy-MM-dd HH:mm")
+                              .format(DateTime.now()),
+                          'fechaPedido': fechaPedidoController.text,
                         };
 
                         showDialog(
@@ -187,7 +202,13 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
                                 TextButton(
                                   child: Text('Sí'),
                                   onPressed: () {
-                                    print(jsonEncode(pedido));
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DireccionScreen(
+                                            pedido: detallesPedido),
+                                      ),
+                                    );
                                   },
                                 ),
                                 TextButton(
