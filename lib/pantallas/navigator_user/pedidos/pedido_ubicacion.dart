@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:hyzar/pantallas/navigator_user/pedidos/pedidos.dart';
 import 'package:hyzar/pantallas/principal.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
@@ -16,13 +17,73 @@ GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
 
 class DireccionScreen extends StatefulWidget {
   final Map<String, dynamic> pedido;
+  final String formaPago;
+  final double total;
+  final String nombreUsuario;
 
-  DireccionScreen({required this.pedido});
+  DireccionScreen(
+      {required this.pedido,
+      required this.formaPago,
+      required this.total,
+      required this.nombreUsuario});
   @override
   _DireccionScreenState createState() => _DireccionScreenState();
 }
 
 class _DireccionScreenState extends State<DireccionScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    calleController.addListener(() {
+      if (calleController.text.isNotEmpty) {
+        setState(() {
+          calle = calleController.text;
+        });
+      }
+    });
+
+    numeroController.addListener(() {
+      if (numeroController.text.isNotEmpty) {
+        setState(() {
+          numero = numeroController.text;
+        });
+      }
+    });
+
+    coloniaController.addListener(() {
+      if (coloniaController.text.isNotEmpty) {
+        setState(() {
+          colonia = coloniaController.text;
+        });
+      }
+    });
+
+    ciudadController.addListener(() {
+      if (ciudadController.text.isNotEmpty) {
+        setState(() {
+          ciudad = ciudadController.text;
+        });
+      }
+    });
+
+    zip_codeController.addListener(() {
+      if (zip_codeController.text.isNotEmpty) {
+        setState(() {
+          zip_code = zip_codeController.text;
+        });
+      }
+    });
+
+    campoExtraController.addListener(() {
+      if (campoExtraController.text.isNotEmpty) {
+        setState(() {
+          campoExtra = campoExtraController.text;
+        });
+      }
+    });
+  }
+
   String direccion = '';
   String calle = '';
   String colonia = '';
@@ -132,7 +193,6 @@ class _DireccionScreenState extends State<DireccionScreen> {
                 ),
                 child: TextField(
                   onTap: _handlePressButton,
-                  readOnly: calle.isNotEmpty,
                   controller: calleController,
                 ),
               ),
@@ -146,7 +206,6 @@ class _DireccionScreenState extends State<DireccionScreen> {
                       numero.isEmpty ? Colors.red[100] : Colors.blue[100],
                 ),
                 child: TextField(
-                  readOnly: numero.isNotEmpty,
                   controller: numeroController,
                 ),
               ),
@@ -160,7 +219,6 @@ class _DireccionScreenState extends State<DireccionScreen> {
                       colonia.isEmpty ? Colors.red[100] : Colors.blue[100],
                 ),
                 child: TextField(
-                  readOnly: colonia.isNotEmpty,
                   controller: coloniaController,
                 ),
               ),
@@ -174,7 +232,6 @@ class _DireccionScreenState extends State<DireccionScreen> {
                       ciudad.isEmpty ? Colors.red[100] : Colors.blue[100],
                 ),
                 child: TextField(
-                  readOnly: ciudad.isNotEmpty,
                   controller: ciudadController,
                 ),
               ),
@@ -188,79 +245,108 @@ class _DireccionScreenState extends State<DireccionScreen> {
                       zip_code.isEmpty ? Colors.red[100] : Colors.blue[100],
                 ),
                 child: TextField(
-                  readOnly: zip_code.isNotEmpty,
                   controller: zip_codeController,
                 ),
               ),
             ),
             ElevatedButton(
               onPressed: () async {
+                bool confirm = await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Confirmar pedido'),
+                      content: Text(
+                          '¿Estás seguro de que quieres realizar este pedido?'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text('Cancelar'),
+                          onPressed: () {
+                            Navigator.of(context).pop(false);
+                          },
+                        ),
+                        TextButton(
+                          child: Text('Confirmar'),
+                          onPressed: () {
+                            Navigator.of(context).pop(true);
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
                 // Asegúrate de que todos los campos estén llenos
-                if (calle.isNotEmpty &&
-                    numero.isNotEmpty &&
-                    colonia.isNotEmpty &&
-                    ciudad.isNotEmpty &&
-                    zip_code.isNotEmpty) {
-                  // Combina los detalles del pedido y la dirección en un solo mapa
-                  Uuid uuid = Uuid();
-                  String pedidoUID = uuid.v4();
-                  Map<String, dynamic> pedidoCompleto = {
-                    pedidoUID: {
-                      'detalles_productos': widget.pedido,
-                      'direccion_pedido': {
-                        'calle': calle,
-                        'numero': numero,
-                        'colonia': colonia,
-                        'ciudad': ciudad,
-                        'zip_code': zip_code,
-                      },
-                      'estado': 'pendiente',
-                      'pagado': false,
+                if (confirm != null && confirm) {
+                  if (calle.isNotEmpty &&
+                      numero.isNotEmpty &&
+                      colonia.isNotEmpty &&
+                      ciudad.isNotEmpty &&
+                      zip_code.isNotEmpty) {
+                    // Combina los detalles del pedido y la dirección en un solo mapa
+                    Uuid uuid = Uuid();
+                    String pedidoUID = uuid.v4();
+                    Map<String, dynamic> pedidoCompleto = {
+                      pedidoUID: {
+                        'detalles_productos': widget.pedido,
+                        'direccion_pedido': {
+                          'calle': calle,
+                          'numero': numero,
+                          'colonia': colonia,
+                          'ciudad': ciudad,
+                          'zip_code': zip_code,
+                        },
+                        'total': widget.total,
+                        'forma_pago': widget.formaPago,
+                        'nombreUsuario': widget.nombreUsuario,
+                        'estado': 'pendiente',
+                        'pagado': false,
+                      }
+                    };
+
+                    // Obtiene el userID
+                    String userID =
+                        Provider.of<UserNotifier>(context, listen: false)
+                            .getUserID();
+
+                    // Comprueba si ya existe un documento con el mismo userID
+                    DocumentSnapshot docSnap = await FirebaseFirestore.instance
+                        .collection('pedidos')
+                        .doc(userID)
+                        .get();
+
+                    if (docSnap.exists) {
+                      // Si el documento ya existe, agrega el nuevo pedido al documento
+                      await FirebaseFirestore.instance
+                          .collection('pedidos')
+                          .doc(userID)
+                          .update(pedidoCompleto);
+                    } else {
+                      // Si el documento no existe, crea un nuevo documento con el userID y el pedido
+                      await FirebaseFirestore.instance
+                          .collection('pedidos')
+                          .doc(userID)
+                          .set(pedidoCompleto);
                     }
-                  };
 
-                  // Obtiene el userID
-                  String userID =
-                      Provider.of<UserNotifier>(context, listen: false)
-                          .getUserID();
+                    // Muestra un mensaje de éxito
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Pedido realizado con éxito')),
+                    );
 
-                  // Comprueba si ya existe un documento con el mismo userID
-                  DocumentSnapshot docSnap = await FirebaseFirestore.instance
-                      .collection('pedidos')
-                      .doc(userID)
-                      .get();
-
-                  if (docSnap.exists) {
-                    // Si el documento ya existe, agrega el nuevo pedido al documento
-                    await FirebaseFirestore.instance
-                        .collection('pedidos')
-                        .doc(userID)
-                        .update(pedidoCompleto);
+                    // Regresa a PantallaUS
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => PrincipalUser()),
+                      (Route<dynamic> route) => false,
+                    );
                   } else {
-                    // Si el documento no existe, crea un nuevo documento con el userID y el pedido
-                    await FirebaseFirestore.instance
-                        .collection('pedidos')
-                        .doc(userID)
-                        .set(pedidoCompleto);
+                    // Muestra un mensaje de error si algún campo está vacío
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content:
+                              Text('Por favor, completa todos los campos')),
+                    );
                   }
-
-                  // Muestra un mensaje de éxito
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Pedido realizado con éxito')),
-                  );
-
-                  // Regresa a PantallaUS
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => PrincipalUser()),
-                    (Route<dynamic> route) => false,
-                  );
-                } else {
-                  // Muestra un mensaje de error si algún campo está vacío
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text('Por favor, completa todos los campos')),
-                  );
                 }
               },
               child: Text('Realizar pedido'),

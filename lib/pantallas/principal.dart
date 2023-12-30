@@ -3,6 +3,8 @@ import 'dart:ffi';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:hyzar/pantallas/navigator_admin/pedidos_admin/PedidosAdmin.dart';
+import 'package:hyzar/pantallas/navigator_admin/usuarios/Usuarios.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
 import 'navigator/busqueda.dart';
@@ -35,15 +37,17 @@ class _PrincipalUserState extends State<PrincipalUser> {
   late List<Widget> _childrenAdmin = [
     PantallaUS(),
     PantallaBusqueda(),
-    const PantallaPedidos(),
+    PedidosAdmin(),
+    UsuariosAdmin(),
     PantallaAgregar(),
   ];
   final List<String> _titlesUsuario = ["Productos", "Búsqueda", "Pedidos"];
   final List<String> _titlesAdmin = [
-    "Productos",
-    "Búsqueda",
-    "Pedidos",
-    "Agregar",
+    "Productos en linea",
+    "Búsqueda de productos",
+    "Pedidos actuales",
+    "Deudas de usuarios",
+    "Agregar productos",
   ];
 
   @override
@@ -104,7 +108,8 @@ class _PrincipalUserState extends State<PrincipalUser> {
           _childrenAdmin = [
             PantallaUS(),
             PantallaBusqueda(),
-            const PantallaPedidos(),
+            PedidosAdmin(),
+            UsuariosAdmin(),
             PantallaAgregar(),
           ];
           List<Widget> children =
@@ -126,6 +131,12 @@ class _PrincipalUserState extends State<PrincipalUser> {
             ),
           ];
           if (tipoUsuario == 'admin') {
+            items.add(
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.people),
+                label: 'Usuarios',
+              ),
+            );
             items.add(
               const BottomNavigationBarItem(
                 icon: Icon(Icons.add),

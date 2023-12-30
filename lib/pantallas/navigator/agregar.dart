@@ -53,7 +53,8 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
     try {
       if (imagen != null) {
         mostrarDialogoDeProgreso(context);
-        final ref = FirebaseStorage.instance.ref().child(codigo);
+        final ref =
+            FirebaseStorage.instance.ref().child('medicamentos/$codigo');
         final uploadTask = ref.putFile(imagen);
         final taskSnapshot = uploadTask.snapshotEvents.listen((snapshot) {
           setState(() {

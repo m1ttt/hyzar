@@ -81,12 +81,26 @@ class _LoginScreenState extends State<LoginScreen> {
           if (userData != null && userData["tipo"] == "usuario") {
             // El usuario es un usuario normal
             print("Es un usuario");
+            Provider.of<UserNotifier>(context, listen: false)
+                .setEmail(user.email!);
+            Provider.of<UserNotifier>(context, listen: false)
+                .setUserType(userData["tipo"]);
+            Provider.of<UserNotifier>(context, listen: false).setUserID(userID);
+            Provider.of<UserNotifier>(context, listen: false)
+                .setNombre(userData["nombre"]);
             Navigator.push(
                 context, SlideFromRightPageRoute(enterPage: PrincipalUser()));
             // Aquí puedes realizar acciones específicas para los usuarios normales
           } else if (userData != null && userData["tipo"] == "admin") {
             // El usuario es un administrador
             print("Es un administrador");
+            Provider.of<UserNotifier>(context, listen: false)
+                .setEmail(user.email!);
+            Provider.of<UserNotifier>(context, listen: false)
+                .setUserType(userData["tipo"]);
+            Provider.of<UserNotifier>(context, listen: false).setUserID(userID);
+            Provider.of<UserNotifier>(context, listen: false)
+                .setNombre(userData["nombre"]);
             Navigator.push(
                 context, SlideFromRightPageRoute(enterPage: PrincipalUser()));
 
@@ -175,6 +189,9 @@ class _LoginScreenState extends State<LoginScreen> {
               .setEmail(user.email!);
           Provider.of<UserNotifier>(context, listen: false)
               .setUserType(userData["tipo"]);
+          Provider.of<UserNotifier>(context, listen: false).setUserID(userID);
+          Provider.of<UserNotifier>(context, listen: false)
+              .setNombre(userData["nombre"]);
           Navigator.push(
               context, SlideFromRightPageRoute(enterPage: PrincipalUser()));
           // Aquí puedes realizar acciones específicas para los usuarios normales
@@ -187,7 +204,9 @@ class _LoginScreenState extends State<LoginScreen> {
               .setUserType(userData["tipo"]);
           Navigator.push(
               context, SlideFromRightPageRoute(enterPage: PrincipalUser()));
-
+          Provider.of<UserNotifier>(context, listen: false).setUserID(userID);
+          Provider.of<UserNotifier>(context, listen: false)
+              .setNombre(userData["nombre"]);
           // Aquí puedes realizar acciones específicas para los administradores
         } else {
           // El usuario no tiene el campo "tipo" definido o no es ni usuario ni admin

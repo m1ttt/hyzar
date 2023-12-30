@@ -22,6 +22,7 @@ class PantallaPedidosConfirm extends StatefulWidget {
 
 class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
   ScrollController _scrollController = ScrollController();
+  String? formaPago;
   List<int> contador = [];
   TextEditingController fechaPedidoController = TextEditingController();
 
@@ -33,6 +34,7 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
 
   @override
   Widget build(BuildContext context) {
+    final formasPago = ['Efectivo', 'Transferencia SPEI', 'TDC/TDD'];
     double total = 0;
     for (int i = 0; i < widget.documentos.length; i++) {
       final doc = widget.documentos[i];
@@ -166,12 +168,30 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
                         }
                       },
                     ),
+                    DropdownButton<String>(
+                      value: formaPago,
+                      hint: Text('Selecciona una forma de pago'),
+                      items: formasPago.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          formaPago = newValue;
+                        });
+                      },
+                    ),
                     ElevatedButton(
                       onPressed: () {
                         // Obtén el userId del UserNotifier
                         final userId =
                             Provider.of<UserNotifier>(context, listen: false)
                                 .getUserID();
+                        final nombreUsuario =
+                            Provider.of<UserNotifier>(context, listen: false)
+                                .getNombre();
 
                         Map<String, dynamic> productos = {
                           for (int index = 0;
@@ -186,40 +206,21 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
 
                         Map<String, dynamic> detallesPedido = {
                           'productos': productos,
-                          'total': total,
                           'fechaActual': DateFormat("yyyy-MM-dd HH:mm")
                               .format(DateTime.now()),
                           'fechaPedido': fechaPedidoController.text,
                         };
 
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('Confirmar pedido'),
-                              content: Text('¿Estás seguro?'),
-                              actions: [
-                                TextButton(
-                                  child: Text('Sí'),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => DireccionScreen(
-                                            pedido: detallesPedido),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                TextButton(
-                                  child: Text('No'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DireccionScreen(
+                              pedido: detallesPedido,
+                              formaPago: formaPago!,
+                              total: total,
+                              nombreUsuario: nombreUsuario,
+                            ),
+                          ),
                         );
                       },
                       child: Text('Confirmar pedido'),
