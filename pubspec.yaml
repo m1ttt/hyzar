@@ -51,7 +51,11 @@ dependencies:
   cached_network_image: ^3.3.0
   google_maps_flutter: ^2.5.0
   google_place: ^0.4.0
-  flutter_google_places_hoc081098: ^1.0.1
+  flutter_google_places_hoc081098: ^1.2.0
+  pdf: ^3.10.7
+  printing: ^5.11.1
+  path_provider: ^2.1.1
+  google_fonts: ^4.0.4
 
 dev_dependencies:
   flutter_test:
@@ -91,10 +95,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: OpenSans
+      fonts:
+        - asset: lib/estilos/fonts/OpenSans-Medium.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

@@ -1,5 +1,12 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
+import 'package:printing/printing.dart';
 
 class PedidosAdminCard extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -13,6 +20,33 @@ class PedidosAdminCard extends StatefulWidget {
 
 class _PedidosAdminCardState extends State<PedidosAdminCard> {
   String? estadoSeleccionado;
+
+  void generarPDF(Map<String, dynamic> direccionPedido) async {
+    final pdf = pw.Document();
+
+    final fontData =
+        await rootBundle.load("lib/estilos/fonts/OpenSans-Medium.ttf");
+    final ttf = pw.Font.ttf(fontData);
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) => pw.Center(
+          child: pw.Text(
+            'Dirección: ${direccionPedido['calle']}, ${direccionPedido['numero']}, ${direccionPedido['colonia']}, ${direccionPedido['ciudad']}, ${direccionPedido['zip_code']}',
+            style: pw.TextStyle(fontSize: 30, font: ttf),
+          ),
+        ),
+      ),
+    );
+
+    final output = await getTemporaryDirectory();
+    final file = File("${output.path}/pedido.pdf");
+    await file.writeAsBytes(await pdf.save());
+
+    Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +163,12 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                               );
                             },
                           );
+                        },
+                      ),
+                      Chip(
+                        label: Text('Imprimir PDF'),
+                        onDeleted: () {
+                          generarPDF(direccionPedido);
                         },
                       ),
                       Chip(

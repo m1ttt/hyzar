@@ -59,16 +59,12 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
               return Card(
                 child: ListTile(
                   leading: data['imagen'] != null && data['imagen'].isNotEmpty
-                      ? CachedNetworkImage(
-                          imageUrl: data['imagen'],
+                      ? Image.network(
+                          data['imagen'],
                           width: 50, // Ancho de la imagen
                           height: 50, // Altura de la imagen
                           fit: BoxFit
                               .cover, // Para mantener la relación de aspecto de la imagen
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
                         )
                       : Icon(Icons.warning, color: Colors.red),
                   title: Text(data['nombre']),
