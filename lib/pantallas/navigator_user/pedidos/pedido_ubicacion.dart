@@ -1,14 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
-import 'package:google_maps_webservice/places.dart';
-import 'package:hyzar/pantallas/navigator_user/pedidos/pedidos.dart';
+import 'package:flutter_google_places_hoc081098/google_maps_webservice_places.dart';
 import 'package:hyzar/pantallas/principal.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-
-import '../../navigator/inicio/inicio.dart';
 
 const kGoogleApiKey =
     "AIzaSyDkI-wIVbRdbLU2vKot_f0qyT_BQ-ew4rU"; // Reemplaza con tu API Key

@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hyzar/pantallas/navigator/pdfscreen/funciones/generarpdf.dart';
 
-class PedidoCard extends StatelessWidget {
+class PedidoCard extends StatefulWidget {
   final Map<String, dynamic> detallesPedido;
   final String pedidoID;
   final String userID;
@@ -14,12 +15,33 @@ class PedidoCard extends StatelessWidget {
       : super(key: key);
 
   @override
+  _PedidoCardState createState() => _PedidoCardState();
+}
+
+class _PedidoCardState extends State<PedidoCard> {
+  bool filtrarPagado = false;
+  late Map<String, dynamic> detallesPedido;
+  late String pedidoID;
+  late String userID;
+
+  @override
+  void initState() {
+    super.initState();
+    detallesPedido = widget.detallesPedido;
+    pedidoID = widget.pedidoID;
+    userID = widget.userID;
+  }
+
+  @override
   Widget build(BuildContext context) {
     Map<String, dynamic> detallesProductos =
         detallesPedido['detalles_productos'];
     Map<String, dynamic> direccionPedido = detallesPedido['direccion_pedido'];
     bool pagado = detallesPedido['pagado'];
     String estado = detallesPedido['estado'];
+    if (filtrarPagado && !pagado) {
+      return Container();
+    }
     return Card(
       margin: EdgeInsets.all(10),
       child: Padding(
@@ -29,7 +51,7 @@ class PedidoCard extends StatelessWidget {
           children: [
             ListTile(
               title: Text('Pedido ID: $pedidoID',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               subtitle: Row(
                 children: <Widget>[
                   Text('Estado: '),
@@ -47,43 +69,91 @@ class PedidoCard extends StatelessWidget {
                 color: pagado ? Colors.green : Colors.red,
               ),
             ),
+            // ...
+
+            // ...
             Divider(),
-            ...detallesProductos['productos'].entries.map((producto) {
-              return ListTile(
-                title: Text('Producto: ${producto.value['nombre']}'),
-                trailing: Text('Cantidad: ${producto.value['cantidad']}'),
-              );
-            }),
-            Divider(),
-            ListTile(
-              title: Text('Fecha Actual: ${detallesProductos['fechaActual']}'),
-              trailing:
-                  Text('Fecha del Pedido: ${detallesProductos['fechaPedido']}'),
-            ),
-            Divider(),
-            ListTile(
-              title: Text('Total: ${detallesPedido['total']}'),
-            ),
-            Divider(),
-            ListTile(
-              title: Row(
-                children: <Widget>[
-                  Text('Forma de pago: '),
-                  Chip(
-                    label: Text(
-                      ' ${detallesPedido['forma_pago']}',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    backgroundColor: Colors.blue,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  InputChip(
+                    avatar: Icon(Icons.shopping_cart),
+                    label: Text('Productos'),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Productos adquiridos'),
+                            content: Column(
+                              children: detallesProductos['productos']
+                                  .entries
+                                  .map<Widget>((producto) {
+                                return ListTile(
+                                  title: Text(
+                                      'Producto: ${producto.value['nombre']}'),
+                                  trailing: Text(
+                                      'Cantidad: ${producto.value['cantidad']}'),
+                                );
+                              }).toList(),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  SizedBox(width: 10),
+                  InputChip(
+                    avatar: Icon(Icons.print),
+                    label: Text('Imprimir PDF'),
+                    onPressed: () async {
+                      PdfUtils.generarPDF(detallesPedido, context);
+                    },
+                  ),
+                  SizedBox(width: 10),
+                  InputChip(
+                    avatar: Icon(Icons.location_on),
+                    label: Text('Dirección'),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Dirección de entrega'),
+                            content: Text(
+                                '${direccionPedido['calle']}, ${direccionPedido['numero']}, ${direccionPedido['colonia']}, ${direccionPedido['ciudad']}, ${direccionPedido['zip_code']}'),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  SizedBox(width: 10),
+                  InputChip(
+                    avatar: Icon(Icons.receipt),
+                    label: Text('Facturación'),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Dirección de entrega'),
+                            content: Text(
+                                'Método de pago: ${detallesPedido['forma_pago']}'),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ],
               ),
             ),
-            Divider(),
+// ...
+// ...
             ListTile(
-              title: Text(
-                  'Dirección: ${direccionPedido['calle']}, ${direccionPedido['numero']}, ${direccionPedido['colonia']}, ${direccionPedido['ciudad']}, ${direccionPedido['zip_code']}'),
+              title: Text('Total: ${detallesPedido['total']}'),
             ),
+
             if (!pagado)
               ElevatedButton(
                 child: Text('Cancelar'),

@@ -38,8 +38,8 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 20),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 20),
               Text('Subiendo medicamento... ${(uploadProgress ?? 0.0) * 100}%'),
             ],
           ),
@@ -48,21 +48,33 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
     );
   }
 
+  Future<String> subirImagen(File imagen, String codigo) async {
+    try {
+      final ref = FirebaseStorage.instance.ref().child('$codigo');
+      final uploadTask = ref.putFile(imagen);
+
+      uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+        setState(() {
+          uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
+        });
+      });
+
+      final taskSnapshot = await uploadTask;
+      final imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+      return imageUrl;
+    } catch (e) {
+      print('Error al subir imagen: $e');
+      throw e;
+    }
+  }
+
   Future<void> agregarMedicamento(
       String codigo, Map<String, dynamic> datos, File? imagen) async {
     try {
       if (imagen != null) {
         mostrarDialogoDeProgreso(context);
-        final ref =
-            FirebaseStorage.instance.ref().child('medicamentos/$codigo');
-        final uploadTask = ref.putFile(imagen);
-        final taskSnapshot = uploadTask.snapshotEvents.listen((snapshot) {
-          setState(() {
-            uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
-          });
-        });
-        await uploadTask.whenComplete(() => taskSnapshot.cancel());
-        datos['imagen'] = await ref.getDownloadURL();
+        datos['imagen'] = await subirImagen(imagen, codigo);
         Navigator.of(context).pop(); // Cierra el cuadro de diálogo
 
         setState(() {
@@ -102,9 +114,9 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
             children: [
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: const Color.fromARGB(
-                      255, 0, 105, 243), // background color
-                  onPrimary: Colors.white, // foreground color
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color.fromARGB(
+                      255, 0, 105, 243), // foreground color
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 ),
@@ -125,9 +137,10 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
               Card(
                 child: TextField(
                   controller: codigoController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Código',
                   ),
+                  keyboardType: TextInputType.number,
                 ),
               ),
               ElevatedButton(
@@ -140,7 +153,7 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
                             child: Wrap(
                               children: <Widget>[
                                 ListTile(
-                                  leading: Icon(Icons.photo_library),
+                                  leading: const Icon(Icons.photo_library),
                                   title:
                                       const Text('Seleccionar de la galería'),
                                   onTap: () {
@@ -149,8 +162,8 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
                                   },
                                 ),
                                 ListTile(
-                                  leading: Icon(Icons.photo_camera),
-                                  title: Text('Tomar foto'),
+                                  leading: const Icon(Icons.photo_camera),
+                                  title: const Text('Tomar foto'),
                                   onTap: () {
                                     seleccionarImagen(ImageSource.camera);
                                     Navigator.of(context).pop();
@@ -168,15 +181,16 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
               Card(
                 child: TextField(
                   controller: existenciasController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Existencias',
                   ),
+                  keyboardType: TextInputType.number,
                 ),
               ),
               Card(
                 child: TextField(
                   controller: nombreController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Nombre',
                   ),
                 ),
@@ -184,7 +198,7 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
               Card(
                 child: TextField(
                   controller: descripcionController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Descripción',
                   ),
                 ),
@@ -192,7 +206,7 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
               Card(
                 child: TextField(
                   controller: precioFarmController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Precio Farmacia',
                   ),
                   keyboardType: TextInputType.number,
@@ -201,7 +215,7 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
               Card(
                 child: TextField(
                   controller: precioPubController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Precio Público',
                   ),
                   keyboardType: TextInputType.number,
@@ -230,7 +244,7 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
 
                   // Mostrar un mensaje
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Medicamento subido con éxito'),
                     ),
                   );

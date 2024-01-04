@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import 'navigator/busqueda.dart';
 import 'navigator/inicio/inicio.dart';
 import 'navigator/perfil.dart';
-import 'navigator/agregar.dart';
+import 'navigator/agregar/agregar.dart';
 import 'navigator_user/pedidos/pedidos.dart';
 
 class PrincipalUser extends StatefulWidget {

@@ -3,10 +3,11 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
+import 'package:hyzar/pantallas/navigator/pdfscreen/funciones/generarpdf.dart';
+
 import 'package:path_provider/path_provider.dart';
-import 'package:printing/printing.dart';
+
+import '../../../navigator/pdfscreen/pdfscreen.dart';
 
 class PedidosAdminCard extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -20,33 +21,6 @@ class PedidosAdminCard extends StatefulWidget {
 
 class _PedidosAdminCardState extends State<PedidosAdminCard> {
   String? estadoSeleccionado;
-
-  void generarPDF(Map<String, dynamic> direccionPedido) async {
-    final pdf = pw.Document();
-
-    final fontData =
-        await rootBundle.load("lib/estilos/fonts/OpenSans-Medium.ttf");
-    final ttf = pw.Font.ttf(fontData);
-
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) => pw.Center(
-          child: pw.Text(
-            'Dirección: ${direccionPedido['calle']}, ${direccionPedido['numero']}, ${direccionPedido['colonia']}, ${direccionPedido['ciudad']}, ${direccionPedido['zip_code']}',
-            style: pw.TextStyle(fontSize: 30, font: ttf),
-          ),
-        ),
-      ),
-    );
-
-    final output = await getTemporaryDirectory();
-    final file = File("${output.path}/pedido.pdf");
-    await file.writeAsBytes(await pdf.save());
-
-    Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,71 +114,86 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: <Widget>[
-                      Chip(
-                        label: Text('Productos'),
-                        onDeleted: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('Productos adquiridos'),
-                                content: Column(
-                                  children: detallesProductos['productos']
-                                      .entries
-                                      .map<Widget>((producto) {
-                                    return ListTile(
-                                      title: Text(
-                                          'Producto: ${producto.value['nombre']}'),
-                                      trailing: Text(
-                                          'Cantidad: ${producto.value['cantidad']}'),
-                                    );
-                                  }).toList(),
-                                ),
-                              );
-                            },
-                          );
-                        },
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: InputChip(
+                          avatar: Icon(Icons.shopping_cart),
+                          label: Text('Productos'),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                    title: Text('Productos adquiridos'),
+                                    content: Column(
+                                      children: detallesProductos['productos']
+                                          .entries
+                                          .map<Widget>((producto) {
+                                        return ListTile(
+                                          title: Text(
+                                              'Producto: ${producto.value['nombre']}'),
+                                          trailing: Text(
+                                              'Cantidad: ${producto.value['cantidad']}'),
+                                        );
+                                      }).toList(),
+                                    ));
+                              },
+                            );
+                          },
+                        ),
                       ),
-                      Chip(
-                        label: Text('Imprimir PDF'),
-                        onDeleted: () {
-                          generarPDF(direccionPedido);
-                        },
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: InputChip(
+                          avatar: Icon(Icons.print),
+                          label: Text('Imprimir PDF'),
+                          onPressed: () {
+                            PdfUtils.generarPDF(detallesPedido, context);
+                          },
+                        ),
                       ),
-                      Chip(
-                        label: Text('Dirección'),
-                        onDeleted: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('Dirección de entrega'),
-                                content: Text(
-                                    'Dirección: ${direccionPedido['calle']}, ${direccionPedido['numero']}, ${direccionPedido['colonia']}, ${direccionPedido['ciudad']}, ${direccionPedido['zip_code']}'),
-                              );
-                            },
-                          );
-                        },
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: InputChip(
+                          avatar: Icon(Icons.location_on),
+                          label: Text('Dirección'),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Dirección de entrega'),
+                                  content: Text(
+                                      'Dirección: ${direccionPedido['calle']}, ${direccionPedido['numero']}, ${direccionPedido['colonia']}, ${direccionPedido['ciudad']}, ${direccionPedido['zip_code']}'),
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
-                      Chip(
-                        label: Text('Facturación'),
-                        onDeleted: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('Facturación'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Text(
-                                        'Método de pago: ${detallesPedido['forma_pago']}'),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: InputChip(
+                          avatar: Icon(Icons.receipt),
+                          label: Text('Facturación'),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Facturación'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Text(
+                                          'Método de pago: ${detallesPedido['forma_pago']}'),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),

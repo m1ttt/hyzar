@@ -1,20 +1,20 @@
 //TODO: MANDARLO A TODO A PEDIDOS, YA ESTA EL JSON, MANDARLO A FIRESTORE Y CON SU ESTATUS.
 
-import 'package:cached_network_image/cached_network_image.dart';
+// ignore_for_file: must_be_immutable, library_private_types_in_public_api
+
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/pedido_ubicacion.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
 
 import 'package:provider/provider.dart';
 
 class PantallaPedidosConfirm extends StatefulWidget {
   List<DocumentSnapshot> documentos;
 
-  PantallaPedidosConfirm({required this.documentos});
+  PantallaPedidosConfirm({super.key, required this.documentos});
 
   @override
   _PantallaPedidosConfirmState createState() => _PantallaPedidosConfirmState();
@@ -182,9 +182,7 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
                     ElevatedButton(
                       onPressed: () {
                         // Obtén el userId del UserNotifier
-                        final userId =
-                            Provider.of<UserNotifier>(context, listen: false)
-                                .getUserID();
+
                         final nombreUsuario =
                             Provider.of<UserNotifier>(context, listen: false)
                                 .getNombre();

@@ -6,6 +6,10 @@
 		<string>Activa la camara para poder escanear el código</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>Activa el acceso a tu galería para subir el archivo de la foto</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>Necesitamos el permiso para guardar fotos en tu galería.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Need microphone access for uploading audio</string>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true />
 		<key>CFBundleDevelopmentRegion</key>
@@ -33,7 +37,7 @@
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true />
 		<key>io.flutter.embedded_views_preview</key>
-		<true />
+		<string>YES</string>
 		<key>GoogleMapsApiKey</key>
 		<string>AIzaSyDkI-wIVbRdbLU2vKot_f0qyT_BQ-ew4rU</string>
 		<key>UILaunchStoryboardName</key>
