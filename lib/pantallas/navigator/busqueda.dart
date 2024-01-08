@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vibration/vibration.dart';
-import 'detalle_medicamento.dart';
+import '../Detalles/detalle_medicamento.dart';
 
 class PantallaBusqueda extends StatefulWidget {
   const PantallaBusqueda({Key? key}) : super(key: key);

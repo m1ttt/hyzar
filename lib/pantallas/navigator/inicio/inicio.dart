@@ -7,10 +7,10 @@ import 'package:hyzar/pantallas/navigator_user/pedidos/pedidos_confirm.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../detalle_medicamento.dart';
+import '../../Detalles/detalle_medicamento.dart';
 
 class PantallaUS extends StatefulWidget {
-  const PantallaUS({Key? key}) : super(key: key);
+  const PantallaUS({super.key});
 
   @override
   _PantallaUSState createState() => _PantallaUSState();
@@ -101,9 +101,9 @@ class _PantallaUSState extends State<PantallaUS>
                 existencias / 100, // Asume que 100 es el máximo de existencias
               )!;
               if (mostrarSoloEliminados && data['eliminado'] == 0) {
-                return Container(height: 0, width: 0);
+                return const SizedBox(height: 0, width: 0);
               } else if (!mostrarSoloEliminados && data['eliminado'] == 1) {
-                return Container(height: 0, width: 0);
+                return const SizedBox(height: 0, width: 0);
               } else {
                 return GestureDetector(
                   onTap: () {
@@ -134,15 +134,22 @@ class _PantallaUSState extends State<PantallaUS>
                         child: ListTile(
                           leading:
                               (data['imagen'] == null || data['imagen'] == '')
-                                  ? Icon(Icons.warning, size: 60)
-                                  : CachedNetworkImage(
-                                      imageUrl: data['imagen'],
-                                      width: 60,
-                                      height: 60,
-                                      placeholder: (context, url) =>
-                                          CircularProgressIndicator(),
-                                      errorWidget: (context, url, error) =>
-                                          Icon(Icons.error),
+                                  ? const Icon(
+                                      Icons.warning,
+                                      size: 60,
+                                      color: Colors.yellow,
+                                    )
+                                  : ClipRRect(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      child: CachedNetworkImage(
+                                        imageUrl: data['imagen'],
+                                        width: 60,
+                                        height: 60,
+                                        placeholder: (context, url) =>
+                                            const CircularProgressIndicator(),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(Icons.error),
+                                      ),
                                     ),
                           title: Text('${data['nombre']}'),
                           subtitle: Text('Existencias: ${data['existencias']}'),

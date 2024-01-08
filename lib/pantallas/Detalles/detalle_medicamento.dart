@@ -3,7 +3,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sn_progress_dialog/progress_dialog.dart';
 
 class DetalleMedicamentoScreen extends StatefulWidget {
   final Map<String, dynamic> medicamento;
