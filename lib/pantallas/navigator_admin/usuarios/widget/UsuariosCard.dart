@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UsuariosCard extends StatefulWidget {
   final String idUsuario;
   final String nombre;
   final double total;
+  final String correo;
+  final String telefono;
 
-  UsuariosCard(this.idUsuario, this.nombre, this.total);
+  UsuariosCard(
+      this.idUsuario, this.nombre, this.total, this.correo, this.telefono);
 
   @override
   _UsuariosCardState createState() => _UsuariosCardState();
@@ -35,7 +39,7 @@ class _UsuariosCardState extends State<UsuariosCard> {
                     style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    'Nombre: ${widget.nombre}',
+                    '${widget.nombre}',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   Text(
@@ -51,20 +55,54 @@ class _UsuariosCardState extends State<UsuariosCard> {
               children: [
                 IconButton(
                   icon: Icon(Icons.comment),
-                  onPressed: () {
+                  onPressed: () async {
                     // Acción al presionar el botón de mensaje
+                    String url = 'sms:${widget.telefono}';
+                    if (await canLaunch(url)) {
+                      await launch(url);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'No se encontró ninguna aplicación de mensajes'),
+                        ),
+                      );
+                    }
                   },
                 ),
                 IconButton(
                   icon: Icon(Icons.mail),
-                  onPressed: () {
+                  onPressed: () async {
                     // Acción al presionar el botón de correo
+                    String url = 'mailto:${widget.correo}';
+                    if (await canLaunch(url)) {
+                      await launch(url);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'No se encontró ninguna aplicación de correo'),
+                        ),
+                      );
+                    }
                   },
                 ),
                 IconButton(
                   icon: Icon(Icons.phone),
-                  onPressed: () {
+                  onPressed: () async {
                     // Acción al presionar el botón de llamada
+                    String url = 'tel:${widget.telefono}';
+                    print(url);
+                    if (await canLaunch(url)) {
+                      await launch(url);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'No se encontró ninguna aplicación de télefono'),
+                        ),
+                      );
+                    }
                   },
                 ),
               ],

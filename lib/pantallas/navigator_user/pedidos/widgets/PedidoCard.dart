@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/pantallas/navigator/pdfscreen/funciones/generarpdf.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PedidoCard extends StatefulWidget {
   final Map<String, dynamic> detallesPedido;
@@ -106,7 +107,7 @@ class _PedidoCardState extends State<PedidoCard> {
                     avatar: Icon(Icons.print),
                     label: Text('Imprimir PDF'),
                     onPressed: () async {
-                      PdfUtils.generarPDF(detallesPedido, context);
+                      PdfUtils.generarPDF(detallesPedido, pedidoID, context);
                     },
                   ),
                   SizedBox(width: 10),
@@ -120,7 +121,21 @@ class _PedidoCardState extends State<PedidoCard> {
                           return AlertDialog(
                             title: Text('Dirección de entrega'),
                             content: Text(
-                                '${direccionPedido['calle']}, ${direccionPedido['numero']}, ${direccionPedido['colonia']}, ${direccionPedido['ciudad']}, ${direccionPedido['zip_code']}'),
+                                '${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}'),
+                            actions: [
+                              TextButton(
+                                child: Text('Abrir en Google Maps'),
+                                onPressed: () async {
+                                  final url =
+                                      'https://www.google.com/maps/search/?api=1&query=${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}';
+                                  if (await canLaunch(url)) {
+                                    await launch(url);
+                                  } else {
+                                    throw 'No se pudo abrir $url';
+                                  }
+                                },
+                              ),
+                            ],
                           );
                         },
                       );
@@ -135,7 +150,7 @@ class _PedidoCardState extends State<PedidoCard> {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: Text('Dirección de entrega'),
+                            title: Text('Método de pago'),
                             content: Text(
                                 'Método de pago: ${detallesPedido['forma_pago']}'),
                           );

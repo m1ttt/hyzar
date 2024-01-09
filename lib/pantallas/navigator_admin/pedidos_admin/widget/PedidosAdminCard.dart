@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:hyzar/pantallas/navigator/pdfscreen/funciones/generarpdf.dart';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../navigator/pdfscreen/pdfscreen.dart';
 
@@ -148,7 +149,8 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                           avatar: Icon(Icons.print),
                           label: Text('Imprimir PDF'),
                           onPressed: () {
-                            PdfUtils.generarPDF(detallesPedido, context);
+                            PdfUtils.generarPDF(
+                                detallesPedido, pedidoID, context);
                           },
                         ),
                       ),
@@ -164,7 +166,21 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                                 return AlertDialog(
                                   title: Text('Dirección de entrega'),
                                   content: Text(
-                                      'Dirección: ${direccionPedido['calle']}, ${direccionPedido['numero']}, ${direccionPedido['colonia']}, ${direccionPedido['ciudad']}, ${direccionPedido['zip_code']}'),
+                                      '${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}'),
+                                  actions: [
+                                    TextButton(
+                                      child: Text('Abrir en Google Maps'),
+                                      onPressed: () async {
+                                        final url =
+                                            'https://www.google.com/maps/search/?api=1&query=${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}';
+                                        if (await canLaunch(url)) {
+                                          await launch(url);
+                                        } else {
+                                          throw 'No se pudo abrir $url';
+                                        }
+                                      },
+                                    ),
+                                  ],
                                 );
                               },
                             );
@@ -207,7 +223,7 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                 ),
                 Divider(),
                 ListTile(
-                  title: Text('Total: ${detallesPedido['total']}'),
+                  title: Text('Total: ${detallesPedido['total']}\$'),
                 ),
                 ElevatedButton(
                   child: Text('Cancelar'),

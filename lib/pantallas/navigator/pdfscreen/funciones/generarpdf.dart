@@ -6,8 +6,8 @@ import 'package:path_provider/path_provider.dart';
 import '../pdfscreen.dart';
 
 class PdfUtils {
-  static Future<void> generarPDF(
-      Map<String, dynamic> detallesPedido, BuildContext context) async {
+  static Future<void> generarPDF(Map<String, dynamic> detallesPedido, pedidoID,
+      BuildContext context) async {
     final pdf = pw.Document();
 
     // Agrega los detalles del pedido al PDF...
@@ -26,6 +26,7 @@ class PdfUtils {
           detallesProductos: detallesPedido['detalles_productos'],
           direccionPedido: detallesPedido['direccion_pedido'],
           nombreUsuario: detallesPedido['nombreUsuario'],
+          pedidoID: pedidoID,
         ),
       ),
     );

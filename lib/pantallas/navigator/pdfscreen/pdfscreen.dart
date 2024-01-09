@@ -14,9 +14,11 @@ class PdfScreen extends StatefulWidget {
   final Map<String, dynamic> detallesProductos;
   final Map<String, dynamic> direccionPedido;
   final String nombreUsuario;
+  final String pedidoID;
 
   PdfScreen({
     required this.pdfPath,
+    required this.pedidoID,
     required this.detallesPedido,
     required this.detallesProductos,
     required this.direccionPedido,
@@ -47,20 +49,25 @@ class _PdfScreenState extends State<PdfScreen> {
         await rootBundle.load("lib/estilos/fonts/OpenSans-Medium.ttf");
     final ttf = pdfWidgets.Font.ttf(fontData);
 
-    // Agrega los datos del pedido al PDF...
     pdf.addPage(
       pdfWidgets.Page(
         build: (pdfWidgets.Context context) => pdfWidgets.Center(
           child: pdfWidgets.Column(
             children: [
-              pdfWidgets.Text('Pedido: ${widget.detallesPedido['id']}',
-                  style: pdfWidgets.TextStyle(fontSize: 40, font: ttf)),
+              pdfWidgets.Text('Pedido: ${widget.pedidoID}',
+                  style: pdfWidgets.TextStyle(fontSize: 30, font: ttf)),
               pdfWidgets.Text('Usuario: ${widget.nombreUsuario}',
                   style: pdfWidgets.TextStyle(fontSize: 20, font: ttf)),
               pdfWidgets.Text('Productos:',
                   style: pdfWidgets.TextStyle(fontSize: 20, font: ttf)),
+              ...widget.detallesProductos['productos'].entries.map((producto) {
+                return pdfWidgets.Text(
+                  'Producto: ${producto.value['nombre'].toString()}, Cantidad: ${producto.value['cantidad'].toString()}',
+                  style: pdfWidgets.TextStyle(fontSize: 20, font: ttf),
+                );
+              }).toList(),
               pdfWidgets.Text(
-                  'Dirección de entrega: ${widget.direccionPedido['direccion']}',
+                  'Dirección de entrega: ${widget.direccionPedido['calle']} ${widget.direccionPedido['ciudad']} ${widget.direccionPedido['colonia']} ${widget.direccionPedido['numero']} ${widget.direccionPedido['zip_code']}',
                   style: pdfWidgets.TextStyle(fontSize: 20, font: ttf)),
             ],
           ),
