@@ -42,10 +42,12 @@ class _UsuariosCardState extends State<UsuariosCard> {
                     '${widget.nombre}',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  Text(
-                    'Total: ${widget.total.toStringAsFixed(2)}',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  widget.total == 0
+                      ? SizedBox.shrink() // Widget vacío que no ocupa espacio
+                      : Text(
+                          'Total: ${widget.total.toStringAsFixed(2)}\$',
+                          style: TextStyle(fontSize: 16),
+                        ),
                 ],
               ),
             ),
