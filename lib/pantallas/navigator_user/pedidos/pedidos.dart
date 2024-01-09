@@ -57,7 +57,6 @@ class _PantallaPedidosState extends State<PantallaPedidos> {
       body: Padding(
         padding: const EdgeInsets.all(5.0),
         child: Container(
-          color: Colors.white,
           child: StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('pedidos')

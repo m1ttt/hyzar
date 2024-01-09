@@ -88,7 +88,6 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
@@ -98,7 +97,6 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
           ),
         ),
         body: Container(
-          color: Colors.white,
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 50.0),

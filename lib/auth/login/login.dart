@@ -278,11 +278,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               Text(
                                 "Inicia sesión para continuar",
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: Colors.black.withOpacity(0.6),
                                   fontSize: 35,
+                                  fontWeight:
+                                      FontWeight.bold, // Añade esta línea
                                 ),
-                              ),
+                              )
                             ],
                           ),
                         ),

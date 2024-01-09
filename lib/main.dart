@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:hyzar/main/widgets/app_theme.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 
 void main() {
   runApp(
@@ -30,14 +31,23 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Widget _buildSuccess() {
-    return MaterialApp(
-      routes: {
-        '/login': (context) => const LoginScreen(),
+  Widget _buildSuccess(BuildContext context) {
+    return DynamicColorBuilder(
+      builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+        // Si los colores dinámicos están disponibles, úsalos; si no, usa los esquemas de color predeterminados
+        ColorScheme lightScheme = lightDynamic ?? ColorScheme.light();
+        ColorScheme darkScheme = darkDynamic ?? ColorScheme.dark();
+
+        return MaterialApp(
+          routes: {
+            '/login': (context) => const LoginScreen(),
+          },
+          debugShowCheckedModeBanner: false,
+          theme: buildThemeData(lightScheme), // Tema claro
+          darkTheme: buildThemeData(darkScheme), // Tema oscuro
+          home: const LoginScreen(),
+        );
       },
-      debugShowCheckedModeBanner: false,
-      theme: buildThemeData(),
-      home: const LoginScreen(),
     );
   }
 
@@ -53,7 +63,7 @@ class MyApp extends StatelessWidget {
         }
 
         if (snapshot.connectionState == ConnectionState.done) {
-          return _buildSuccess();
+          return _buildSuccess(context);
         }
 
         return _buildLoading();

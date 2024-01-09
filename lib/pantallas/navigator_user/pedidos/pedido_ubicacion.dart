@@ -186,7 +186,10 @@ class _DireccionScreenState extends State<DireccionScreen> {
                 decoration: InputDecoration(
                   labelText: 'Calle',
                   filled: true,
-                  fillColor: calle.isEmpty ? Colors.red[100] : Colors.blue[100],
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color:
+                              calle.isEmpty ? Colors.red : Colors.transparent)),
                 ),
                 child: TextField(
                   onTap: _handlePressButton,
@@ -197,11 +200,13 @@ class _DireccionScreenState extends State<DireccionScreen> {
             ListTile(
               title: InputDecorator(
                 decoration: InputDecoration(
-                  labelText: 'Número',
-                  filled: true,
-                  fillColor:
-                      numero.isEmpty ? Colors.red[100] : Colors.blue[100],
-                ),
+                    labelText: 'Número',
+                    filled: true,
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: numero.isEmpty
+                                ? Colors.red
+                                : Colors.transparent))),
                 child: TextField(
                   controller: numeroController,
                 ),
@@ -212,8 +217,11 @@ class _DireccionScreenState extends State<DireccionScreen> {
                 decoration: InputDecoration(
                   labelText: 'Colonia',
                   filled: true,
-                  fillColor:
-                      colonia.isEmpty ? Colors.red[100] : Colors.blue[100],
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: colonia.isEmpty
+                              ? Colors.red
+                              : Colors.transparent)),
                 ),
                 child: TextField(
                   controller: coloniaController,
@@ -225,8 +233,11 @@ class _DireccionScreenState extends State<DireccionScreen> {
                 decoration: InputDecoration(
                   labelText: 'Ciudad',
                   filled: true,
-                  fillColor:
-                      ciudad.isEmpty ? Colors.red[100] : Colors.blue[100],
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: ciudad.isEmpty
+                              ? Colors.red
+                              : Colors.transparent)),
                 ),
                 child: TextField(
                   controller: ciudadController,
@@ -238,8 +249,11 @@ class _DireccionScreenState extends State<DireccionScreen> {
                 decoration: InputDecoration(
                   labelText: 'Código postal',
                   filled: true,
-                  fillColor:
-                      zip_code.isEmpty ? Colors.red[100] : Colors.blue[100],
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: zip_code.isEmpty
+                              ? Colors.red
+                              : Colors.transparent)),
                 ),
                 child: TextField(
                   controller: zip_codeController,

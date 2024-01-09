@@ -69,9 +69,7 @@ class _PedidoCardState extends State<PedidoCard> {
                 color: pagado ? Colors.green : Colors.red,
               ),
             ),
-            // ...
 
-            // ...
             Divider(),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -149,7 +147,7 @@ class _PedidoCardState extends State<PedidoCard> {
               ),
             ),
 // ...
-// ...
+            Divider(),
             ListTile(
               title: Text('Total: ${detallesPedido['total']}'),
             ),
