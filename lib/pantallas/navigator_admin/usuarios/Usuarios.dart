@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import 'widget/UsuariosCard.dart';
+import 'widget/UsuariosInfo.dart';
 
 enum EstadoFiltro { firestore, realtime }
 
@@ -32,13 +33,19 @@ class _UsuariosAdminState extends State<UsuariosAdmin> {
               datosPorUsuario[idUsuario]!['total'] += totalPedido;
             }
           } else {
+            DatabaseReference ref = FirebaseDatabase.instance
+                .ref()
+                .child('usuarios')
+                .child(idUsuario);
+            DataSnapshot dataSnapshot = await ref.get();
+            Map<String, dynamic> data = Map<String, dynamic>.from(
+                dataSnapshot.value as Map<dynamic, dynamic>);
             datosPorUsuario[idUsuario] = {
-              'nombre': pedido[
-                  'nombreUsuario'], // Asumiendo que el nombre del usuario está en el pedido
+              'nombre': data['nombre'],
               'total': totalPedido,
-              'correo': '', // Asumiendo que el correo no está disponible aquí
-              'telefono':
-                  '', // Asumiendo que el teléfono no está disponible aquí
+              'correo': data['correo'],
+              'telefono': data['telefono'],
+              'tipo': data['tipo']
             };
           }
         }
@@ -84,12 +91,26 @@ class _UsuariosAdminState extends State<UsuariosAdmin> {
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
               var entry = snapshot.data!.entries.elementAt(index);
-              return UsuariosCard(
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UsuariosInfo(
+                        idUsuario: entry.key,
+                        datosUsuario: entry.value,
+                      ),
+                    ),
+                  );
+                },
+                child: UsuariosCard(
                   entry.key,
                   entry.value['nombre'],
                   entry.value['total'] ?? 0.0,
                   entry.value['correo'],
-                  entry.value['telefono']);
+                  entry.value['telefono'],
+                ),
+              );
             },
           );
         },
