@@ -48,62 +48,102 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ListTile(
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'ID Usuario: ${widget.idUsuario}',
-                        style:
-                            TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        'Nombre: $nombreUsuario',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  subtitle: Row(
-                    children: <Widget>[
-                      Text('Estado: '),
-                      DropdownButton<String>(
-                        value: estadoSeleccionado,
-                        items: <String>[
-                          'pendiente',
-                          'entregado',
-                          'en transporte'
-                        ].map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            estadoSeleccionado = newValue;
-                            FirebaseFirestore.instance
-                                .collection('pedidos')
-                                .doc(widget.idUsuario)
-                                .update(
-                                    {'$pedidoID.estado': estadoSeleccionado});
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  trailing: InkWell(
-                    onTap: () async {
-                      await FirebaseFirestore.instance
-                          .collection('pedidos')
-                          .doc(idUsuario)
-                          .update({'$pedidoID.pagado': !pagado});
-                    },
-                    child: Icon(
-                      pagado ? Icons.check_circle : Icons.cancel,
-                      color: pagado ? Colors.green : Colors.red,
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'ID Usuario: ${widget.idUsuario}',
+                          style: TextStyle(
+                              fontSize: 9, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          'Nombre: $nombreUsuario',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
-                  ),
-                ),
+                    subtitle: Row(
+                      children: <Widget>[
+                        Text('Estado: '),
+                        DropdownButton<String>(
+                          value: estadoSeleccionado,
+                          items: <String>[
+                            'pendiente',
+                            'entregado',
+                            'en transporte'
+                          ].map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              estadoSeleccionado = newValue;
+                              FirebaseFirestore.instance
+                                  .collection('pedidos')
+                                  .doc(widget.idUsuario)
+                                  .update(
+                                      {'$pedidoID.estado': estadoSeleccionado});
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    trailing: InkWell(
+                      onTap: () async {
+                        await FirebaseFirestore.instance
+                            .collection('pedidos')
+                            .doc(idUsuario)
+                            .update({'$pedidoID.pagado': !pagado});
+
+                        if (!pagado) {
+                          // Accede al documento 'detalles_productos'
+                          DocumentSnapshot detallesProductosSnapshot =
+                              await FirebaseFirestore.instance
+                                  .collection('pedidos')
+                                  .doc(idUsuario)
+                                  .collection(pedidoID)
+                                  .doc('detalles_productos')
+                                  .collection('productos')
+                                  .doc('productos')
+                                  .get();
+
+                          Map<String, dynamic> detallesProductosData =
+                              detallesProductosSnapshot.data()
+                                  as Map<String, dynamic>;
+
+                          // Actualiza las existencias de cada producto en el pedido
+                          for (var entry in detallesProductosData.entries) {
+                            String productoId = entry.key;
+                            Map<String, dynamic> productoData =
+                                entry.value as Map<String, dynamic>;
+                            int cantidad = productoData['cantidad'];
+
+                            // Obtén las existencias actuales del producto
+                            DocumentSnapshot productoSnapshot =
+                                await FirebaseFirestore.instance
+                                    .collection('medicamentos')
+                                    .doc(productoId)
+                                    .get();
+                            int existencias = (productoSnapshot.data()
+                                as Map<String, dynamic>)['existencias'] as int;
+
+                            // Actualiza las existencias del producto
+                            await FirebaseFirestore.instance
+                                .collection('medicamentos')
+                                .doc(productoId)
+                                .update(
+                                    {'existencias': existencias - cantidad});
+                          }
+                        }
+                      },
+                      child: Icon(
+                        pagado ? Icons.check_circle : Icons.cancel,
+                        color: pagado ? Colors.green : Colors.red,
+                      ),
+                    )),
                 Divider(),
                 ListTile(
                   title: Text(

@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/funciones/pedido.dart';
@@ -18,6 +19,7 @@ class PantallaUS extends StatefulWidget {
 
 class _PantallaUSState extends State<PantallaUS>
     with SingleTickerProviderStateMixin {
+  ContainerTransitionType _transitionType = ContainerTransitionType.fade;
   late String userType;
   late String email;
   bool ordenarPorNombre = true;
@@ -175,27 +177,39 @@ class _PantallaUSState extends State<PantallaUS>
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           if (_selectedItems.isNotEmpty)
-            FloatingActionButton.extended(
-              heroTag: "FAB1",
-              onPressed: () async {
-                List<String> ids = _selectedItems.toList();
-                List<DocumentSnapshot> datosPedidos =
-                    await obtenerDatosDePedidos(ids);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        PantallaPedidosConfirm(documentos: datosPedidos),
-                  ),
-                ).then((_) {
-                  // Limpia _selectedItems después de navegar a PantallaPedidosConfirm
-                  setState(() {
-                    _selectedItems.clear();
-                  });
-                });
+            FutureBuilder<List<DocumentSnapshot>>(
+              // Obtener los datosPedidos aquí
+              future: obtenerDatosDePedidos(_selectedItems.toList()),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  List<DocumentSnapshot> datosPedidos = snapshot.data!;
+
+                  return OpenContainer(
+                    closedElevation: 6.0,
+                    openElevation: 0.0,
+                    closedShape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(56 / 2)),
+                    ),
+                    transitionDuration: Duration(milliseconds: 500),
+                    openBuilder: (BuildContext context, VoidCallback _) {
+                      return PantallaPedidosConfirm(documentos: datosPedidos);
+                    },
+                    closedBuilder:
+                        (BuildContext context, VoidCallback openContainer) {
+                      return FloatingActionButton.extended(
+                        heroTag: "FAB1",
+                        onPressed: openContainer, // Abre el OpenContainer
+                        label: const Text("Crear pedido"),
+                        icon: const Icon(Icons.add_shopping_cart),
+                      );
+                    },
+                  );
+                } else {
+                  // Manejar estados de carga o error aquí
+                  return CircularProgressIndicator();
+                }
               },
-              label: const Text("Crear pedido"),
-              icon: const Icon(Icons.add_shopping_cart),
             ),
           const SizedBox(height: 10), // Cambiado width a height
           FloatingActionButton.extended(
