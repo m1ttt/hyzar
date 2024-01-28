@@ -88,8 +88,8 @@ class _LoginScreenState extends State<LoginScreen> {
             Provider.of<UserNotifier>(context, listen: false).setUserID(userID);
             Provider.of<UserNotifier>(context, listen: false)
                 .setNombre(userData["nombre"]);
-            Navigator.push(
-                context, SlideFromRightPageRoute(enterPage: PrincipalUser()));
+            Navigator.push(context,
+                SlideFromRightPageRoute(enterPage: const PrincipalUser()));
             // Aquí puedes realizar acciones específicas para los usuarios normales
           } else if (userData != null && userData["tipo"] == "admin") {
             // El usuario es un administrador
@@ -101,8 +101,8 @@ class _LoginScreenState extends State<LoginScreen> {
             Provider.of<UserNotifier>(context, listen: false).setUserID(userID);
             Provider.of<UserNotifier>(context, listen: false)
                 .setNombre(userData["nombre"]);
-            Navigator.push(
-                context, SlideFromRightPageRoute(enterPage: PrincipalUser()));
+            Navigator.push(context,
+                SlideFromRightPageRoute(enterPage: const PrincipalUser()));
 
             // Aquí puedes realizar acciones específicas para los administradores
           } else {
@@ -192,8 +192,8 @@ class _LoginScreenState extends State<LoginScreen> {
           Provider.of<UserNotifier>(context, listen: false).setUserID(userID);
           Provider.of<UserNotifier>(context, listen: false)
               .setNombre(userData["nombre"]);
-          Navigator.push(
-              context, SlideFromRightPageRoute(enterPage: PrincipalUser()));
+          Navigator.push(context,
+              SlideFromRightPageRoute(enterPage: const PrincipalUser()));
           // Aquí puedes realizar acciones específicas para los usuarios normales
         } else if (userData != null && userData["tipo"] == "admin") {
           // El usuario es un administrador
@@ -202,8 +202,8 @@ class _LoginScreenState extends State<LoginScreen> {
               .setEmail(user.email!);
           Provider.of<UserNotifier>(context, listen: false)
               .setUserType(userData["tipo"]);
-          Navigator.push(
-              context, SlideFromRightPageRoute(enterPage: PrincipalUser()));
+          Navigator.push(context,
+              SlideFromRightPageRoute(enterPage: const PrincipalUser()));
           Provider.of<UserNotifier>(context, listen: false).setUserID(userID);
           Provider.of<UserNotifier>(context, listen: false)
               .setNombre(userData["nombre"]);
@@ -258,10 +258,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         tween: Tween(begin: 1, end: _elementsOpacity),
                         builder: (_, value, __) => Opacity(
                           opacity: value,
-                          child: Column(
+                          child: const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Row(
+                              Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Icon(Icons.medication,
