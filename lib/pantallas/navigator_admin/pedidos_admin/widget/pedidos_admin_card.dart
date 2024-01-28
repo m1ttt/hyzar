@@ -1,22 +1,19 @@
-import 'dart:io';
+// ignore_for_file: deprecated_member_use
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hyzar/pantallas/navigator/pdfscreen/funciones/generarpdf.dart';
-
-import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../../navigator/pdfscreen/pdfscreen.dart';
 
 class PedidosAdminCard extends StatefulWidget {
   final Map<String, dynamic> data;
   final String idUsuario;
 
-  PedidosAdminCard({required this.data, required this.idUsuario});
+  const PedidosAdminCard(
+      {super.key, required this.data, required this.idUsuario});
 
   @override
+  // ignore: library_private_types_in_public_api
   _PedidosAdminCardState createState() => _PedidosAdminCardState();
 }
 
@@ -31,8 +28,6 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
         Map<String, dynamic> detallesPedido = entry.value;
         Map<String, dynamic> detallesProductos =
             detallesPedido['detalles_productos'];
-        Map<String, dynamic> direccionPedido =
-            detallesPedido['direccion_pedido'];
         bool pagado = detallesPedido['pagado'];
         String estado = detallesPedido['estado'];
         String nombreUsuario = detallesPedido['nombreUsuario'];
@@ -41,7 +36,7 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
         estadoSeleccionado = estado;
 
         return Card(
-          margin: EdgeInsets.all(10),
+          margin: const EdgeInsets.all(10),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -53,19 +48,19 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                       children: [
                         Text(
                           'ID Usuario: ${widget.idUsuario}',
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 9, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           'Nombre: $nombreUsuario',
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                     subtitle: Row(
                       children: <Widget>[
-                        Text('Estado: '),
+                        const Text('Estado: '),
                         DropdownButton<String>(
                           value: estadoSeleccionado,
                           items: <String>[
@@ -99,44 +94,7 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                             .update({'$pedidoID.pagado': !pagado});
 
                         if (!pagado) {
-                          // Accede al documento 'detalles_productos'
-                          DocumentSnapshot detallesProductosSnapshot =
-                              await FirebaseFirestore.instance
-                                  .collection('pedidos')
-                                  .doc(idUsuario)
-                                  .collection(pedidoID)
-                                  .doc('detalles_productos')
-                                  .collection('productos')
-                                  .doc('productos')
-                                  .get();
-
-                          Map<String, dynamic> detallesProductosData =
-                              detallesProductosSnapshot.data()
-                                  as Map<String, dynamic>;
-
-                          // Actualiza las existencias de cada producto en el pedido
-                          for (var entry in detallesProductosData.entries) {
-                            String productoId = entry.key;
-                            Map<String, dynamic> productoData =
-                                entry.value as Map<String, dynamic>;
-                            int cantidad = productoData['cantidad'];
-
-                            // Obtén las existencias actuales del producto
-                            DocumentSnapshot productoSnapshot =
-                                await FirebaseFirestore.instance
-                                    .collection('medicamentos')
-                                    .doc(productoId)
-                                    .get();
-                            int existencias = (productoSnapshot.data()
-                                as Map<String, dynamic>)['existencias'] as int;
-
-                            // Actualiza las existencias del producto
-                            await FirebaseFirestore.instance
-                                .collection('medicamentos')
-                                .doc(productoId)
-                                .update(
-                                    {'existencias': existencias - cantidad});
-                          }
+                          print("Pagado");
                         }
                       },
                       child: Icon(
@@ -144,13 +102,13 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                         color: pagado ? Colors.green : Colors.red,
                       ),
                     )),
-                Divider(),
+                const Divider(),
                 ListTile(
                   title: Text(
                     'ID Pedido: $pedidoID',
                   ),
                 ),
-                Divider(),
+                const Divider(),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -158,14 +116,14 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: InputChip(
-                          avatar: Icon(Icons.shopping_cart),
-                          label: Text('Productos'),
+                          avatar: const Icon(Icons.shopping_cart),
+                          label: const Text('Productos'),
                           onPressed: () {
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                    title: Text('Productos adquiridos'),
+                                    title: const Text('Productos adquiridos'),
                                     content: Column(
                                       children: detallesProductos['productos']
                                           .entries
@@ -186,8 +144,8 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: InputChip(
-                          avatar: Icon(Icons.print),
-                          label: Text('Imprimir PDF'),
+                          avatar: const Icon(Icons.print),
+                          label: const Text('Imprimir PDF'),
                           onPressed: () {
                             PdfUtils.generarPDF(
                                 detallesPedido, pedidoID, context);
@@ -197,19 +155,19 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: InputChip(
-                          avatar: Icon(Icons.location_on),
-                          label: Text('Dirección'),
+                          avatar: const Icon(Icons.location_on),
+                          label: const Text('Dirección'),
                           onPressed: () {
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: Text('Dirección de entrega'),
+                                  title: const Text('Dirección de entrega'),
                                   content: Text(
                                       '${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}'),
                                   actions: [
                                     TextButton(
-                                      child: Text('Abrir en Google Maps'),
+                                      child: const Text('Abrir en Google Maps'),
                                       onPressed: () async {
                                         final url =
                                             'https://www.google.com/maps/search/?api=1&query=${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}';
@@ -230,14 +188,14 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: InputChip(
-                          avatar: Icon(Icons.receipt),
-                          label: Text('Facturación'),
+                          avatar: const Icon(Icons.receipt),
+                          label: const Text('Facturación'),
                           onPressed: () {
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: Text('Facturación'),
+                                  title: const Text('Facturación'),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
@@ -254,19 +212,19 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                     ],
                   ),
                 ),
-                Divider(),
+                const Divider(),
                 ListTile(
                   title:
                       Text('Fecha Actual: ${detallesProductos['fechaActual']}'),
                   trailing: Text(
                       'Fecha del Pedido: ${detallesProductos['fechaPedido']}'),
                 ),
-                Divider(),
+                const Divider(),
                 ListTile(
                   title: Text('Total: ${detallesPedido['total']}\$'),
                 ),
                 ElevatedButton(
-                  child: Text('Cancelar'),
+                  child: const Text('Cancelar'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red, // background color
                     foregroundColor: Colors.white, // foreground color
@@ -276,23 +234,23 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: Text('Confirmación'),
-                          content: Text('¿Seguro que quieres cancelar?'),
+                          title: const Text('Confirmación'),
+                          content: const Text('¿Seguro que quieres cancelar?'),
                           actions: <Widget>[
                             TextButton(
-                              child: Text('Sí'),
+                              child: const Text('Sí'),
                               onPressed: () {
                                 FirebaseFirestore.instance
                                     .collection('pedidos')
                                     .doc(idUsuario)
                                     .update({
-                                  '$pedidoID': FieldValue.delete(),
+                                  pedidoID: FieldValue.delete(),
                                 });
                                 Navigator.of(context).pop();
                               },
                             ),
                             TextButton(
-                              child: Text('No'),
+                              child: const Text('No'),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
