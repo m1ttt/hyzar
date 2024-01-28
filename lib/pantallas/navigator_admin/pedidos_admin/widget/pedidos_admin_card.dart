@@ -17,26 +17,54 @@ class PedidosAdminCard extends StatefulWidget {
   _PedidosAdminCardState createState() => _PedidosAdminCardState();
 }
 
-void actualizarExistencias(Map<String, dynamic> detallesPedido) {
+Future<bool> actualizarExistencias(
+    Map<String, dynamic> detallesPedido, BuildContext context) async {
   Map<String, dynamic> detallesProductos = detallesPedido['detalles_productos'];
   Map<String, dynamic> productos = detallesProductos['productos'];
-  productos.forEach((key, value) async {
+  for (var entry in productos.entries) {
+    String key = entry.key;
+    dynamic value = entry.value;
+    DocumentSnapshot doc = await FirebaseFirestore.instance
+        .collection('medicamentos')
+        .doc(key)
+        .get();
+    int existencias = doc.get('existencias');
+    if (existencias < value['cantidad']) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content:
+              Text('No hay suficientes existencias para el producto $key')));
+      return false;
+    }
     await FirebaseFirestore.instance
         .collection('medicamentos')
         .doc(key)
         .update({'existencias': FieldValue.increment(-value['cantidad'])});
-  });
+  }
+  return true;
 }
 
-void incrementarExistencias(Map<String, dynamic> detallesPedido) {
+void incrementarExistencias(Map<String, dynamic> detallesPedido) async {
   Map<String, dynamic> detallesProductos = detallesPedido['detalles_productos'];
   Map<String, dynamic> productos = detallesProductos['productos'];
-  productos.forEach((key, value) async {
+  for (var entry in productos.entries) {
+    String key = entry.key;
+    dynamic value = entry.value;
+    DocumentSnapshot doc = await FirebaseFirestore.instance
+        .collection('medicamentos')
+        .doc(key)
+        .get();
+    if (!doc.exists) {
+      continue;
+    }
+    int existencias = doc.get('existencias');
+    if (existencias == 0) {
+      continue;
+    }
     await FirebaseFirestore.instance
         .collection('medicamentos')
         .doc(key)
         .update({'existencias': FieldValue.increment(value['cantidad'])});
-  });
+  }
 }
 
 class _PedidosAdminCardState extends State<PedidosAdminCard> {
@@ -110,15 +138,25 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                     ),
                     trailing: InkWell(
                       onTap: () async {
-                        await FirebaseFirestore.instance
-                            .collection('pedidos')
-                            .doc(idUsuario)
-                            .update({'$pedidoID.pagado': !pagado});
-
                         if (pagado) {
                           incrementarExistencias(detallesPedido);
+                          await FirebaseFirestore.instance
+                              .collection('pedidos')
+                              .doc(idUsuario)
+                              .update({'$pedidoID.pagado': !pagado});
                         } else {
-                          actualizarExistencias(detallesPedido);
+                          bool success = await actualizarExistencias(
+                              detallesPedido, context);
+                          if (success) {
+                            // Solo marcar como pagado si actualizarExistencias fue exitoso
+                            await FirebaseFirestore.instance
+                                .collection('pedidos')
+                                .doc(idUsuario)
+                                .update({'$pedidoID.pagado': !pagado});
+                          } else {
+                            // Si actualizarExistencias devolvió false, no hacer nada más
+                            return;
+                          }
                         }
                       },
                       child: Icon(
