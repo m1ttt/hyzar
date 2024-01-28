@@ -17,6 +17,28 @@ class PedidosAdminCard extends StatefulWidget {
   _PedidosAdminCardState createState() => _PedidosAdminCardState();
 }
 
+void actualizarExistencias(Map<String, dynamic> detallesPedido) {
+  Map<String, dynamic> detallesProductos = detallesPedido['detalles_productos'];
+  Map<String, dynamic> productos = detallesProductos['productos'];
+  productos.forEach((key, value) async {
+    await FirebaseFirestore.instance
+        .collection('medicamentos')
+        .doc(key)
+        .update({'existencias': FieldValue.increment(-value['cantidad'])});
+  });
+}
+
+void incrementarExistencias(Map<String, dynamic> detallesPedido) {
+  Map<String, dynamic> detallesProductos = detallesPedido['detalles_productos'];
+  Map<String, dynamic> productos = detallesProductos['productos'];
+  productos.forEach((key, value) async {
+    await FirebaseFirestore.instance
+        .collection('medicamentos')
+        .doc(key)
+        .update({'existencias': FieldValue.increment(value['cantidad'])});
+  });
+}
+
 class _PedidosAdminCardState extends State<PedidosAdminCard> {
   String? estadoSeleccionado;
 
@@ -93,8 +115,10 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                             .doc(idUsuario)
                             .update({'$pedidoID.pagado': !pagado});
 
-                        if (!pagado) {
-                          print("Pagado");
+                        if (pagado) {
+                          incrementarExistencias(detallesPedido);
+                        } else {
+                          actualizarExistencias(detallesPedido);
                         }
                       },
                       child: Icon(
