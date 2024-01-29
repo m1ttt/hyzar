@@ -6,6 +6,7 @@ import 'package:hyzar/main/widgets/app_theme.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(

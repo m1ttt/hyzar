@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
-
+import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -228,9 +228,20 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
+        body: Stack(children: [
+      Image.asset(
+        'lib/assets/HyzarLogoWB.png',
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        fit: BoxFit.cover,
+      ),
+      BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+        child: Container(
+          color: Colors.black.withOpacity(0),
+        ),
+      ),
+      SafeArea(
         bottom: false,
         child: _isLoading
             ? const Dialog(
@@ -252,35 +263,35 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 70),
+                      const SizedBox(height: 50),
                       TweenAnimationBuilder<double>(
                         duration: const Duration(milliseconds: 300),
                         tween: Tween(begin: 1, end: _elementsOpacity),
                         builder: (_, value, __) => Opacity(
                           opacity: value,
-                          child: const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.medication,
-                                      size: 60,
-                                      color: Color.fromARGB(255, 0, 105, 243)),
-                                  SizedBox(height: 5),
-                                  Text("Hyzar",
-                                      style: TextStyle(
-                                          fontSize: 30,
-                                          color:
-                                              Color.fromARGB(255, 0, 105, 243),
-                                          fontWeight: FontWeight.bold)),
+                                  Image.asset(
+                                    'lib/assets/HyzarLogoWB.png', // Asegúrate de que esta ruta sea correcta
+                                    height: 180,
+                                  ),
                                 ],
                               ),
+                              SizedBox(height: 0),
+                              Text("Hyzar",
+                                  style: TextStyle(
+                                      fontSize: 34,
+                                      color: Color.fromARGB(255, 18, 136, 185),
+                                      fontWeight: FontWeight.bold)),
                               Text(
                                 "Inicia sesión para continuar",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 35,
+                                  fontSize: 28,
                                   fontWeight:
                                       FontWeight.bold, // Añade esta línea
                                 ),
@@ -319,7 +330,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               buttonText: "Iniciar Sesión",
                               iconData: Icons.arrow_forward_rounded,
                               buttonColor:
-                                  const Color.fromARGB(255, 0, 105, 243),
+                                  const Color.fromARGB(255, 18, 136, 185),
                             ),
                             const SizedBox(height: 16), // Added padding
                             SizedBox(
@@ -340,7 +351,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 buttonText: "Registrarse",
                                 iconData: Icons.how_to_reg,
                                 buttonColor:
-                                    const Color.fromARGB(255, 243, 130, 0),
+                                    const Color.fromARGB(255, 31, 195, 146),
                               ),
                             ),
                           ],
@@ -351,6 +362,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
       ),
-    );
+    ]));
   }
 }
