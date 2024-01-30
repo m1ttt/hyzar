@@ -11,7 +11,7 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => UserNotifier('', '', '', ''),
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
@@ -35,8 +35,8 @@ class MyApp extends StatelessWidget {
     return DynamicColorBuilder(
       builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
         // Si los colores dinámicos están disponibles, úsalos; si no, usa los esquemas de color predeterminados
-        ColorScheme lightScheme = lightDynamic ?? ColorScheme.light();
-        ColorScheme darkScheme = darkDynamic ?? ColorScheme.dark();
+        ColorScheme lightScheme = lightDynamic ?? const ColorScheme.light();
+        ColorScheme darkScheme = darkDynamic ?? const ColorScheme.dark();
 
         return MaterialApp(
           routes: {
