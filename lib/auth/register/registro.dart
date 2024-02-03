@@ -1,8 +1,14 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
+
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:hyzar/utilidades/Colores.dart';
+import 'package:image_picker/image_picker.dart';
 
 class RegistroUsuarioScreen extends StatefulWidget {
   const RegistroUsuarioScreen({super.key});
@@ -13,6 +19,7 @@ class RegistroUsuarioScreen extends StatefulWidget {
 }
 
 class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
+  final picker = ImagePicker();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final DatabaseReference _databaseReference =
       FirebaseDatabase.instance.ref().child("usuarios");
@@ -26,6 +33,21 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
   bool _isMasculino = true;
   bool _aceptoTerminos = false;
+
+  Future<String> subirImagen(File imagen, String codigo) async {
+    try {
+      final ref = FirebaseStorage.instance.ref().child('$codigo');
+      final uploadTask = ref.putFile(imagen);
+
+      final taskSnapshot = await uploadTask;
+      final imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+      return imageUrl;
+    } catch (e) {
+      print('Error al subir imagen: $e');
+      throw e;
+    }
+  }
 
   void _registrarUsuario() async {
     String genero = _isMasculino ? "masculino" : "femenino";
@@ -62,7 +84,6 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
               Navigator.pop(context); // Regresar a la pantalla anterior
             }
           } catch (e) {
-            print(e);
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Autenticación fallida")),
             );
@@ -96,140 +117,140 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
             },
           ),
         ),
-        body: Container(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Row(
-                    children: [
-                      Icon(
-                        Icons.how_to_reg,
-                        size: 60,
-                        color: Color.fromARGB(255, 0, 105, 243),
-                      ),
-                      SizedBox(width: 16),
-                      Text(
-                        "Regístrate",
-                        style: TextStyle(
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Row(
+                  children: [
+                    Icon(
+                      Icons.how_to_reg,
+                      size: 60,
+                      color: Colores.verde,
+                    ),
+                    SizedBox(width: 16),
+                    Text(
+                      "¿Quién eres?",
+                      style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 0, 105, 243),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                  TextField(
-                    controller: _nombreController,
-                    decoration: const InputDecoration(
-                        labelText: 'Nombre',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                          borderSide: BorderSide(width: 1.0),
-                        )),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _correoController,
-                    decoration: const InputDecoration(
-                      labelText: 'Correo',
+                          color: Colores.verde),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                SvgPicture.asset('lib/assets/AgregarImagen.svg',
+                    width: 200, height: 200, color: Colores.gris),
+                const SizedBox(height: 40),
+                TextField(
+                  controller: _nombreController,
+                  decoration: const InputDecoration(
+                      labelText: 'Nombre',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20.0)),
                         borderSide: BorderSide(width: 1.0),
-                      ),
+                      )),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _correoController,
+                  decoration: const InputDecoration(
+                    labelText: 'Correo',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                      borderSide: BorderSide(width: 1.0),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _telefonoController,
-                    decoration: const InputDecoration(
-                      labelText: 'Teléfono',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                        borderSide: BorderSide(width: 1.0),
-                      ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _telefonoController,
+                  decoration: const InputDecoration(
+                    labelText: 'Teléfono',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                      borderSide: BorderSide(width: 1.0),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Radio(
-                        value: true,
-                        groupValue: _isMasculino,
-                        onChanged: (value) {
-                          setState(() {
-                            _isMasculino = value!;
-                          });
-                        },
-                      ),
-                      const Text('Masculino'),
-                      Radio(
-                        value: false,
-                        groupValue: _isMasculino,
-                        onChanged: (value) {
-                          setState(() {
-                            _isMasculino = value!;
-                          });
-                        },
-                      ),
-                      const Text('Femenino'),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Contraseña',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                        borderSide: BorderSide(width: 1.0),
-                      ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Radio(
+                      value: true,
+                      groupValue: _isMasculino,
+                      onChanged: (value) {
+                        setState(() {
+                          _isMasculino = value!;
+                        });
+                      },
+                    ),
+                    const Text('Masculino'),
+                    Radio(
+                      value: false,
+                      groupValue: _isMasculino,
+                      onChanged: (value) {
+                        setState(() {
+                          _isMasculino = value!;
+                        });
+                      },
+                    ),
+                    const Text('Femenino'),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Contraseña',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                      borderSide: BorderSide(width: 1.0),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _confirmPasswordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Confirmar Contraseña',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                        borderSide: BorderSide(width: 1.0),
-                      ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _confirmPasswordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Confirmar Contraseña',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                      borderSide: BorderSide(width: 1.0),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _aceptoTerminos,
-                        onChanged: (value) {
-                          setState(() {
-                            _aceptoTerminos = value!;
-                          });
-                        },
-                      ),
-                      const Text('Acepto los términos'),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: _registrarUsuario,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 0, 105, 243),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 32, vertical: 16),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _aceptoTerminos,
+                      onChanged: (value) {
+                        setState(() {
+                          _aceptoTerminos = value!;
+                        });
+                      },
                     ),
-                    child: const Text('Registrar Usuario'),
+                    const Text('Acepto los términos'),
+                  ],
+                ),
+                const SizedBox(height: 30),
+                ElevatedButton(
+                  onPressed: _registrarUsuario,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 31, 195, 146),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 16),
                   ),
-                  const SizedBox(height: 20),
-                ],
-              ),
+                  child: const Text('Registrar Usuario'),
+                ),
+                const SizedBox(height: 20),
+              ],
             ),
           ),
         ));

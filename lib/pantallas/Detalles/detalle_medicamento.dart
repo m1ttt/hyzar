@@ -197,13 +197,6 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
           Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;
           return Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(data[
-                    'imagen']), // Utiliza NetworkImage para cargar la imagen desde una URL
-                fit: BoxFit.cover,
-              ),
-            ),
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
               child: Column(
