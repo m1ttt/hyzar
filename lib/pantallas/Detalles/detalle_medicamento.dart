@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -122,7 +123,16 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.medicamento['nombre']),
+        title: const Text("Detalles del producto"),
+        elevation: 0,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              color: Color.fromARGB(255, 255, 255, 255).withOpacity(0.0),
+            ),
+          ),
+        ),
         actions: <Widget>[
           if (widget.userType == 'admin')
             IconButton(
@@ -186,13 +196,19 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
 
           Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;
-          return Padding(
+          return Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(data[
+                    'imagen']), // Utiliza NetworkImage para cargar la imagen desde una URL
+                fit: BoxFit.cover,
+              ),
+            ),
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  // ...
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.image),
@@ -230,7 +246,6 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
                               : const Text('No hay imagen disponible'),
                     ),
                   ),
-// ...
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.medication),
@@ -253,7 +268,6 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
                             ),
                     ),
                   ),
-                  const SizedBox(height: 16),
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.inventory),

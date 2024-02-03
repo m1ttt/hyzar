@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -16,7 +17,7 @@ import 'package:provider/provider.dart';
 import '../register/registro.dart';
 
 class Login extends StatelessWidget {
-  const Login({Key? key}) : super(key: key);
+  const Login({super.key});
 
   // This widget is the root of your application.
   @override
@@ -54,18 +55,28 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen>
+    with TickerProviderStateMixin {
   // Aqui son las variables de inicio de sesión
   bool _isLoading = false;
   final Auth _auth = Auth();
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
+  late AnimationController _animationController;
   final double _elementsOpacity = 1;
   StreamSubscription<User?>? _authStateChangesSubscription;
   bool loadingBallAppear = false;
 
   @override
   void initState() {
+    print("Iniciando todo...");
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 5),
+      vsync: this,
+      lowerBound: 0,
+      upperBound: 1,
+      animationBehavior: AnimationBehavior.normal,
+    )..repeat(); // Esto hace que la animación se repita indefinidamente
     User? currentUser = FirebaseAuth.instance.currentUser;
     _authStateChangesSubscription =
         _auth.authStateChanges.listen((User? user) async {
@@ -154,15 +165,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    // Cancelar la suscripción al listener al salir de la pantalla
-    _authStateChangesSubscription?.cancel();
+    _animationController.dispose();
     super.dispose();
   }
 
   void _iniciarSesion() async {
-    setState(() {
-      _isLoading = true;
-    });
     String email = _emailController.text;
     String password = _passwordController.text;
 
@@ -229,14 +236,32 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Stack(children: [
-      Image.asset(
-        'lib/assets/HyzarLogoWB.png',
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        fit: BoxFit.cover,
+      AnimatedBuilder(
+        animation: _animationController,
+        builder: (BuildContext context, Widget? child) {
+          return Transform.rotate(
+            angle: _animationController.value * 2 * pi,
+            child: RepaintBoundary(
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('lib/assets/HyzarLogoWB.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+        child: Image.asset(
+          'lib/assets/HyzarLogoWB.png',
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          fit: BoxFit.cover,
+        ),
       ),
       BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+        filter: ImageFilter.blur(sigmaX: 50, sigmaY: 100),
         child: Container(
           color: Colors.black.withOpacity(0),
         ),
@@ -251,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       CircularProgressIndicator(),
-                      SizedBox(width: 20),
+                      SizedBox(width: 0),
                       Text("Iniciando Sesión"),
                     ],
                   ),
@@ -263,7 +288,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 50),
+                      const SizedBox(height: 10),
                       TweenAnimationBuilder<double>(
                         duration: const Duration(milliseconds: 300),
                         tween: Tween(begin: 1, end: _elementsOpacity),
@@ -281,13 +306,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 0),
-                              Text("Hyzar",
+                              const SizedBox(height: 0),
+                              const Text("Hyzar",
                                   style: TextStyle(
                                       fontSize: 34,
                                       color: Color.fromARGB(255, 18, 136, 185),
                                       fontWeight: FontWeight.bold)),
-                              Text(
+                              const Text(
                                 "Inicia sesión para continuar",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
