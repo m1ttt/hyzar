@@ -19,7 +19,6 @@ class PantallaUS extends StatefulWidget {
 
 class _PantallaUSState extends State<PantallaUS>
     with SingleTickerProviderStateMixin {
-  ContainerTransitionType _transitionType = ContainerTransitionType.fade;
   late String userType;
   late String email;
   bool ordenarPorNombre = true;

@@ -37,7 +37,6 @@ class _PedidoCardState extends State<PedidoCard> {
   Widget build(BuildContext context) {
     Map<String, dynamic> detallesProductos =
         detallesPedido['detalles_productos'];
-    Map<String, dynamic> direccionPedido = detallesPedido['direccion_pedido'];
     bool pagado = detallesPedido['pagado'];
     String estado = detallesPedido['estado'];
     if (filtrarPagado && !pagado) {

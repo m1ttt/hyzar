@@ -136,7 +136,7 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: (searchText == "" || searchText == null)
+              stream: (searchText == "")
                   ? FirebaseFirestore.instance
                       .collection("medicamentos")
                       .snapshots()

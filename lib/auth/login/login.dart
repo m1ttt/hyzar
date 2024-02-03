@@ -59,12 +59,11 @@ class _LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
   // Aqui son las variables de inicio de sesión
   bool _isLoading = false;
-  final Auth _auth = Auth();
+
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
   late AnimationController _animationController;
   final double _elementsOpacity = 1;
-  StreamSubscription<User?>? _authStateChangesSubscription;
   bool loadingBallAppear = false;
 
   @override
@@ -77,55 +76,6 @@ class _LoginScreenState extends State<LoginScreen>
       upperBound: 1,
       animationBehavior: AnimationBehavior.normal,
     )..repeat(); // Esto hace que la animación se repita indefinidamente
-    User? currentUser = FirebaseAuth.instance.currentUser;
-    _authStateChangesSubscription =
-        _auth.authStateChanges.listen((User? user) async {
-      if (user != null && user != currentUser) {
-        String userID = user.uid;
-        DatabaseReference userRef =
-            FirebaseDatabase.instance.ref().child("usuarios").child(userID);
-        DataSnapshot snapshot = (await userRef.once()).snapshot;
-
-        if (snapshot.value != null) {
-          Map<dynamic, dynamic>? userData =
-              snapshot.value as Map<dynamic, dynamic>?;
-          if (userData != null && userData["tipo"] == "usuario") {
-            // El usuario es un usuario normal
-            print("Es un usuario");
-            Provider.of<UserNotifier>(context, listen: false)
-                .setEmail(user.email!);
-            Provider.of<UserNotifier>(context, listen: false)
-                .setUserType(userData["tipo"]);
-            Provider.of<UserNotifier>(context, listen: false).setUserID(userID);
-            Provider.of<UserNotifier>(context, listen: false)
-                .setNombre(userData["nombre"]);
-            Navigator.push(context,
-                SlideFromRightPageRoute(enterPage: const PrincipalUser()));
-            // Aquí puedes realizar acciones específicas para los usuarios normales
-          } else if (userData != null && userData["tipo"] == "admin") {
-            // El usuario es un administrador
-            print("Es un administrador");
-            Provider.of<UserNotifier>(context, listen: false)
-                .setEmail(user.email!);
-            Provider.of<UserNotifier>(context, listen: false)
-                .setUserType(userData["tipo"]);
-            Provider.of<UserNotifier>(context, listen: false).setUserID(userID);
-            Provider.of<UserNotifier>(context, listen: false)
-                .setNombre(userData["nombre"]);
-            Navigator.push(context,
-                SlideFromRightPageRoute(enterPage: const PrincipalUser()));
-
-            // Aquí puedes realizar acciones específicas para los administradores
-          } else {
-            // El usuario no tiene el campo "tipo" definido o no es ni usuario ni admin
-            print(
-                "El tipo de usuario no está definido correctamente. [admin/usuario]]");
-          }
-        }
-      } else {
-        print("No hay usuario autenticado");
-      }
-    });
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
     super.initState();
@@ -243,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen>
             angle: _animationController.value * 2 * pi,
             child: RepaintBoundary(
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage('lib/assets/HyzarLogoWB.png'),
                     fit: BoxFit.cover,

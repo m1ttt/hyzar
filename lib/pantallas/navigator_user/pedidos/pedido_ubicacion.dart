@@ -113,7 +113,7 @@ class _DireccionScreenState extends State<DireccionScreen> {
           strictbounds: false,
           region: "mx",
           hint: "Buscar dirección",
-          startText: direccion == null || direccion == "" ? "" : direccion);
+          startText: direccion == "" ? "" : direccion);
 
       if (p != null && p.placeId != null) {
         calleController.clear();
@@ -127,34 +127,28 @@ class _DireccionScreenState extends State<DireccionScreen> {
         PlacesDetailsResponse detail =
             await _places.getDetailsByPlaceId(p.placeId!);
 
-        if (detail.result.geometry != null &&
-            detail.result.geometry!.location != null) {
-          double lat = detail.result.geometry!.location!.lat;
-          double lng = detail.result.geometry!.location!.lng;
+        if (detail.result.geometry != null) {
+          double lat = detail.result.geometry!.location.lat;
+          double lng = detail.result.geometry!.location.lng;
 
           print(lat);
           print(lng);
 
-          for (AddressComponent component in detail.result.addressComponents!) {
-            if (component.types != null &&
-                component.types!.contains('street_number')) {
-              numero = component.longName ?? '';
+          for (AddressComponent component in detail.result.addressComponents) {
+            if (component.types.contains('street_number')) {
+              numero = component.longName;
               numeroController.text = numero;
-            } else if (component.types != null &&
-                component.types!.contains('route')) {
-              calle = component.longName ?? '';
+            } else if (component.types.contains('route')) {
+              calle = component.longName;
               calleController.text = calle;
-            } else if (component.types != null &&
-                component.types!.contains('sublocality_level_1')) {
-              colonia = component.longName ?? '';
+            } else if (component.types.contains('sublocality_level_1')) {
+              colonia = component.longName;
               coloniaController.text = colonia;
-            } else if (component.types != null &&
-                component.types!.contains('locality')) {
-              ciudad = component.longName ?? '';
+            } else if (component.types.contains('locality')) {
+              ciudad = component.longName;
               ciudadController.text = ciudad;
-            } else if (component.types != null &&
-                component.types!.contains('postal_code')) {
-              zip_code = component.longName ?? '';
+            } else if (component.types.contains('postal_code')) {
+              zip_code = component.longName;
               zip_codeController.text = zip_code;
             }
           }
@@ -287,7 +281,7 @@ class _DireccionScreenState extends State<DireccionScreen> {
                   },
                 );
                 // Asegúrate de que todos los campos estén llenos
-                if (confirm != null && confirm) {
+                if (confirm) {
                   if (calle.isNotEmpty &&
                       numero.isNotEmpty &&
                       colonia.isNotEmpty &&
