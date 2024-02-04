@@ -1,4 +1,5 @@
-import 'package:hyzar/estilos/colors.dart';
+import 'package:hyzar/estilos/Colores.dart';
+
 import 'package:flutter/material.dart';
 
 class EmailField extends StatefulWidget {
@@ -28,7 +29,8 @@ class _EmailFieldState extends State<EmailField>
     _animationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
     final tween = ColorTween(
-        begin: Color.fromARGB(255, 0, 105, 243).withOpacity(0), end: blueColor);
+        begin: Color.fromARGB(255, 0, 105, 243).withOpacity(0),
+        end: Colores.azul);
 
     _animation = tween.animate(_animationController)
       ..addListener(() {
@@ -100,10 +102,7 @@ class _EmailFieldState extends State<EmailField>
                 curve: Curves.easeIn,
                 duration: Duration(milliseconds: 500),
                 builder: ((context, value, child) => LinearProgressIndicator(
-                      value: value,
-                      backgroundColor:
-                          Color.fromARGB(255, 17, 55, 170).withOpacity(0.5),
-                    )),
+                    value: value, backgroundColor: Colores.verde)),
               ),
             ),
           ),

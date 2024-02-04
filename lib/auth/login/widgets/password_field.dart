@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hyzar/estilos/Colores.dart';
 
 class PasswordField extends StatefulWidget {
   final TextEditingController passwordController;
@@ -87,8 +88,7 @@ class _PasswordFieldState extends State<PasswordField> {
                 duration: Duration(milliseconds: 500),
                 builder: ((context, value, child) => LinearProgressIndicator(
                       value: value,
-                      backgroundColor:
-                          Color.fromARGB(255, 17, 55, 170).withOpacity(0.5),
+                      backgroundColor: Colores.verde,
                     )),
               ),
             ),
