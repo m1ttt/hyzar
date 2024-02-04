@@ -2,10 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hyzar/auth/register/numero.dart';
@@ -25,18 +22,9 @@ class RegistroUsuarioScreen extends StatefulWidget {
 class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   final picker = ImagePicker();
   File? _imageFile;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final DatabaseReference _databaseReference =
-      FirebaseDatabase.instance.ref().child("usuarios");
 
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _correoController = TextEditingController();
-  final TextEditingController _telefonoController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-
-  final bool _aceptoTerminos = false;
   String? genero;
 
   Future<String> subirImagen(File imagen, String codigo) async {
@@ -51,60 +39,6 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
     } catch (e) {
       print('Error al subir imagen: $e');
       throw e;
-    }
-  }
-
-  void _registrarUsuario() async {
-    if (_aceptoTerminos) {
-      if (_nombreController.text.isNotEmpty &&
-          _correoController.text.isNotEmpty &&
-          _passwordController.text.isNotEmpty &&
-          _confirmPasswordController.text.isNotEmpty) {
-        if (_passwordController.text == _confirmPasswordController.text) {
-          try {
-            UserCredential userCredential =
-                await _auth.createUserWithEmailAndPassword(
-              email: _correoController.text.trim(),
-              password: _passwordController.text,
-            );
-
-            if (userCredential.user != null) {
-              String userID = userCredential.user!.uid;
-
-              await _databaseReference.child(userID).set({
-                "nombre": _nombreController.text,
-                "correo": _correoController.text,
-                "telefono": _telefonoController.text,
-                "genero": genero,
-                "tipo": "usuario",
-              });
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text("Usuario registrado correctamente")),
-              );
-
-              Navigator.pop(context); // Regresar a la pantalla anterior
-            }
-          } catch (e) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(e.toString())),
-            );
-          }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Las contraseñas no coinciden")),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Todos los campos son requeridos")),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Debes aceptar los términos")),
-      );
     }
   }
 
@@ -250,6 +184,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                 const SizedBox(height: 20),
                 TextField(
                   controller: _nombreController,
+                  textCapitalization: TextCapitalization.words,
                   decoration: InputDecoration(
                     labelText: 'Nombre',
                     enabledBorder: OutlineInputBorder(
@@ -288,6 +223,8 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                       ),
                     ),
                   ),
+                  keyboardType: TextInputType.emailAddress,
+                  keyboardAppearance: Theme.of(context).brightness,
                 ),
                 const SizedBox(height: 16),
                 Container(

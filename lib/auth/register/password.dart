@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hyzar/estilos/Colores.dart';
+import 'package:hyzar/utilidades/widgets/ModalDialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -21,6 +22,7 @@ class PasswordUsuarioscren extends StatefulWidget {
 }
 
 class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
+  bool _obscureText = true;
   final picker = ImagePicker();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final DatabaseReference _databaseReference =
@@ -55,46 +57,73 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
     return file;
   }
 
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+
   void _registrarUsuario() async {
-    Map<String, String> datosCompletos = {
-      ...widget.datosUsuario,
-      'password': _passwordController.text,
-    };
-    print(datosCompletos);
-    try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-              email: datosCompletos["correo"]!.trim(),
-              password: datosCompletos["password"]!);
-
-      if (userCredential.user != null) {
-        String userID = userCredential.user!.uid;
-
-        await _databaseReference.child(userID).set({
-          "nombre": datosCompletos["nombre"],
-          "correo": datosCompletos["correo"],
-          "telefono": datosCompletos["telefono"],
-          "genero": datosCompletos["genero"],
-          "tipo": "usuario",
-        });
-
-        if (datosCompletos["imagen"] != null) {
-          File imagen = await base64ToFile(datosCompletos["imagen"]!);
-          String url = await subirImagen(imagen, userID);
-          await _databaseReference.child(userID).update({"imagen": url});
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Usuario registrado correctamente")),
-        );
-
-        Navigator.of(context).pushNamed('/login');
-      }
-    } catch (e) {
+    if (_passwordController.text != _confirmPasswordController.text) {
+      MessageDialog(context,
+          title: "Alerta",
+          description: "Las contraseñas proporcionadas no coinciden",
+          buttonText: "ACEPTAR", onReadMore: () {
+        Navigator.pop(context);
+      }, showCloseButton: false);
+      return;
+    } else {
+      Map<String, String> datosCompletos = {
+        ...widget.datosUsuario,
+        'password': _passwordController.text,
+      };
       print(datosCompletos);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      try {
+        UserCredential userCredential =
+            await _auth.createUserWithEmailAndPassword(
+                email: datosCompletos["correo"]!.trim(),
+                password: datosCompletos["password"]!);
+
+        if (userCredential.user != null) {
+          String userID = userCredential.user!.uid;
+
+          await _databaseReference.child(userID).set({
+            "nombre": datosCompletos["nombre"],
+            "correo": datosCompletos["correo"],
+            "telefono": datosCompletos["telefono"],
+            "genero": datosCompletos["genero"],
+            "tipo": "usuario",
+          });
+
+          if (datosCompletos["imagen"] != null) {
+            File imagen = await base64ToFile(datosCompletos["imagen"]!);
+            String url = await subirImagen(imagen, userID);
+            await _databaseReference.child(userID).update({"imagen": url});
+          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Usuario registrado correctamente")),
+          );
+
+          Navigator.of(context).pushNamed('/login');
+        }
+      } catch (e) {
+        if (_passwordController.text.length < 8) {
+          MessageDialog(context,
+              title: "Alerta",
+              description: "La contraseña debe tener al menos 8 caracteres",
+              buttonText: "ACEPTAR", onReadMore: () {
+            Navigator.pop(context);
+          }, showCloseButton: false);
+        } else {
+          MessageDialog(context,
+              title: "Error",
+              description: "Error al registrar el usuario: $e",
+              buttonText: "ACEPTAR", onReadMore: () {
+            Navigator.pop(context);
+          }, showCloseButton: false);
+        }
+      }
     }
   }
 
@@ -172,12 +201,20 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
 
                 TextField(
                   controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
+                  obscureText: _obscureText,
+                  decoration: InputDecoration(
                     labelText: 'Contraseña',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(20.0)),
                       borderSide: BorderSide(width: 1.0),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                          _obscureText
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colores.gris),
+                      onPressed: _togglePasswordVisibility,
                     ),
                   ),
                 ),

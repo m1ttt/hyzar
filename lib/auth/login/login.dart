@@ -1,10 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/pantallas/principal.dart';
 import 'package:hyzar/estilos/Colores.dart';
@@ -15,8 +17,10 @@ import 'package:hyzar/auth/login/widgets/get_started_button.dart';
 import 'package:hyzar/auth/login/widgets/password_field.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:hyzar/utilidades/widgets/ModalDialog.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../register/registro.dart';
+import 'package:http/http.dart' as http;
 
 class Login extends StatelessWidget {
   const Login({super.key});
@@ -62,6 +66,7 @@ class _LoginScreenState extends State<LoginScreen>
   // Aqui son las variables de inicio de sesión
   bool _isLoading = false;
   final Auth _auth = Auth();
+
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
   late AnimationController _animationController;
@@ -94,6 +99,8 @@ class _LoginScreenState extends State<LoginScreen>
           if (userData != null && userData["tipo"] == "usuario") {
             // El usuario es un usuario normal
             print("Es un usuario");
+
+            File? _image = (await obtenerImagen(userID))!;
             Provider.of<UserNotifier>(context, listen: false)
                 .setEmail(user.email!);
             Provider.of<UserNotifier>(context, listen: false)
@@ -101,6 +108,7 @@ class _LoginScreenState extends State<LoginScreen>
             Provider.of<UserNotifier>(context, listen: false).setUserID(userID);
             Provider.of<UserNotifier>(context, listen: false)
                 .setNombre(userData["nombre"]);
+            Provider.of<UserNotifier>(context, listen: false).setImage(_image);
             Navigator.push(context,
                 SlideFromRightPageRoute(enterPage: const PrincipalUser()));
             // Aquí puedes realizar acciones específicas para los usuarios normales
@@ -131,6 +139,22 @@ class _LoginScreenState extends State<LoginScreen>
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
     super.initState();
+  }
+
+  Future<File?> obtenerImagen(String idUsuario) async {
+    try {
+      final ref =
+          FirebaseStorage.instance.ref().child('user_images/$idUsuario');
+      final url = await ref.getDownloadURL();
+      final response = await http.get(Uri.parse(url));
+      final directory = await getTemporaryDirectory();
+      final file = File('${directory.path}/$idUsuario');
+      await file.writeAsBytes(response.bodyBytes);
+      return file;
+    } catch (e) {
+      // Si ocurre un error (por ejemplo, la imagen no existe), devolvemos null
+      return null;
+    }
   }
 
   void _showErrorDialog(String message) {

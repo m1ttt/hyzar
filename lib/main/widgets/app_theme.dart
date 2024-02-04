@@ -19,7 +19,6 @@ ThemeData buildThemeData(ColorScheme colorScheme) {
       bodyColor: updatedColorScheme.onBackground,
       displayColor: updatedColorScheme.onBackground,
     ),
-    canvasColor: Colors.transparent,
     useMaterial3: true,
   );
 }

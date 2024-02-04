@@ -10,7 +10,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => UserNotifier('', '', '', ''),
+      create: (context) => UserNotifier('', '', '', '', null),
       child: const MyApp(),
     ),
   );

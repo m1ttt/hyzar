@@ -144,39 +144,41 @@ class _PrincipalUserState extends State<PrincipalUser> {
           }
           return Scaffold(
             appBar: AppBar(
-              automaticallyImplyLeading:
-                  false, // Quitamos la flecha de retroceso
-              title: Text(titles[_currentIndex]),
-              actions: [
-                PopupMenuButton(
-                  onSelected: (value) {
-                    if (value == 'cerrarSesion') {
-                      _cerrarSesion();
-                    }
-                    if (value == 'perfil') {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PantallaPerfil(),
-                        ),
-                      );
-                    }
-                  },
-                  itemBuilder: (BuildContext context) {
-                    return [
-                      const PopupMenuItem(
-                        value: 'perfil',
-                        child: Text('Perfil'),
-                      ),
-                      const PopupMenuItem(
-                        value: 'cerrarSesion',
-                        child: Text('Cerrar Sesión'),
-                      ),
-                    ];
-                  },
+                automaticallyImplyLeading:
+                    false, // Quitamos la flecha de retroceso
+                title: Text(titles[_currentIndex]),
+                actions: []
+                //   PopupMenuButton(
+                //     onSelected: (value) {
+                //       if (value == 'cerrarSesion') {
+                //         _cerrarSesion();
+                //       }
+                //       // if (value == 'perfil') {
+                //       //   Navigator.push(
+                //       //     context,
+                //       //     MaterialPageRoute(
+                //       //         builder: (BuildContext context,) => PantallaPerfil(
+                //       //         controller: myscrollController,
+                //       //       ),
+                //       //     ),
+                //       //   );
+                //       // }
+                //     },
+                //     itemBuilder: (BuildContext context) {
+                //       return [
+                //         const PopupMenuItem(
+                //           value: 'perfil',
+                //           child: Text('Perfil'),
+                //         ),
+                //         const PopupMenuItem(
+                //           value: 'cerrarSesion',
+                //           child: Text('Cerrar Sesión'),
+                //         ),
+                //       ];
+                //     },
+                //   ),
+                // ],
                 ),
-              ],
-            ),
             body: children[_currentIndex],
             extendBody: true,
             bottomNavigationBar: GestureDetector(
@@ -190,7 +192,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
                     builder: (context) => DraggableScrollableSheet(
                       initialChildSize: 0.5,
                       minChildSize: 0.5,
-                      maxChildSize: 1,
+                      maxChildSize: 0.9,
                       builder: (BuildContext context, myscrollController) {
                         return ClipRRect(
                           borderRadius: BorderRadius.only(
@@ -211,7 +213,12 @@ class _PrincipalUserState extends State<PrincipalUser> {
                                         BorderRadius.all(Radius.circular(12)),
                                   ),
                                 ),
-                                Expanded(child: PantallaPerfil()),
+                                Expanded(
+                                  child: PantallaPerfil(
+                                      controller: myscrollController,
+                                      onPrincipal:
+                                          _cerrarSesion), // Pasa el controlador aquí
+                                )
                               ],
                             ),
                           ),
@@ -258,7 +265,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
                       Padding(
                         padding: EdgeInsets.only(
                             bottom:
-                                60), // Ajusta este valor según tus necesidades
+                                50), // Ajusta este valor según tus necesidades
                         child: Container(
                           width: 40,
                           height: 5,
