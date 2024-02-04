@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hyzar/utilidades/Colores.dart';
 
 ThemeData buildThemeData(ColorScheme colorScheme) {
   print(colorScheme);
   ColorScheme updatedColorScheme = colorScheme.copyWith(
-      primary: const Color.fromARGB(255, 18, 136, 185),
-      secondary: const Color.fromARGB(255, 31, 195, 146),
-      surfaceTint: Color.fromARGB(255, 31, 195, 146),
-      primaryContainer: Color.fromARGB(255, 31, 195, 146));
+      primary: Colores.verde,
+      secondary: Colores.azul,
+      surfaceTint: Colores.verde,
+      primaryContainer: Colores.verde);
   return ThemeData(
     colorScheme: updatedColorScheme,
     brightness: updatedColorScheme.brightness,

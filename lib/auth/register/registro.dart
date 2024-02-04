@@ -7,7 +7,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:hyzar/auth/register/numero.dart';
 import 'package:hyzar/utilidades/Colores.dart';
+import 'package:hyzar/utilidades/widgets/MessageDialog.dart';
 import 'package:image_picker/image_picker.dart';
 
 class RegistroUsuarioScreen extends StatefulWidget {
@@ -31,8 +33,8 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
-  bool _isMasculino = true;
-  bool _aceptoTerminos = false;
+  final bool _aceptoTerminos = false;
+  String? genero;
 
   Future<String> subirImagen(File imagen, String codigo) async {
     try {
@@ -50,8 +52,6 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   }
 
   void _registrarUsuario() async {
-    String genero = _isMasculino ? "masculino" : "femenino";
-
     if (_aceptoTerminos) {
       if (_nombreController.text.isNotEmpty &&
           _correoController.text.isNotEmpty &&
@@ -85,7 +85,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
             }
           } catch (e) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Autenticación fallida")),
+              SnackBar(content: Text(e.toString())),
             );
           }
         } else {
@@ -110,7 +110,10 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colores.gris, // Cambia el color del icono a gris
+            ),
             onPressed: () {
               Navigator.of(context)
                   .pop(); // Navegar hacia atrás al presionar el botón de flecha
@@ -119,7 +122,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40.0),
+            padding: const EdgeInsets.symmetric(horizontal: 30.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -130,7 +133,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                       size: 60,
                       color: Colores.verde,
                     ),
-                    SizedBox(width: 16),
+                    SizedBox(width: 10),
                     Text(
                       "¿Quién eres?",
                       style: TextStyle(
@@ -142,114 +145,216 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                 ),
                 const SizedBox(height: 20),
                 SvgPicture.asset('lib/assets/AgregarImagen.svg',
-                    width: 200, height: 200, color: Colores.gris),
-                const SizedBox(height: 40),
+                    width: 150, height: 150, color: Colores.gris),
+                const SizedBox(height: 20),
+                Center(
+                  child: Text(
+                    "Cuentanos más acerca de ti...",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colores.gris),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 TextField(
                   controller: _nombreController,
-                  decoration: const InputDecoration(
-                      labelText: 'Nombre',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                        borderSide: BorderSide(width: 1.0),
-                      )),
+                  decoration: InputDecoration(
+                    labelText: 'Nombre',
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                      borderSide: BorderSide(
+                        color: Colores.gris, // Cambia el color del borde a gris
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                      borderSide: BorderSide(
+                        color: Colores.gris, // Cambia el color del borde a gris
+                        width: 2.0,
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _correoController,
                   decoration: const InputDecoration(
                     labelText: 'Correo',
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                      borderSide: BorderSide(width: 1.0),
+                      borderSide: BorderSide(
+                        color: Colores.gris, // Cambia el color del borde a gris
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                      borderSide: BorderSide(
+                        color: Colores.gris, // Cambia el color del borde a gris
+                        width: 2.0,
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                TextField(
-                  controller: _telefonoController,
-                  decoration: const InputDecoration(
-                    labelText: 'Teléfono',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                      borderSide: BorderSide(width: 1.0),
+                // TextField(
+                //   controller: _telefonoController,
+                //   decoration: const InputDecoration(
+                //     labelText: 'Teléfono',
+                //     enabledBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                //       borderSide: BorderSide(
+                //         color: Colores.gris, // Cambia el color del borde a gris
+                //         width: 1.0,
+                //       ),
+                //     ),
+                //     focusedBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                //       borderSide: BorderSide(
+                //         color: Colores.gris, // Cambia el color del borde a gris
+                //         width: 2.0,
+                //       ),
+                //     ),
+                //   ),
+                // ),
+                // const SizedBox(height: 16),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.0),
+                  height: 60.0, // Ajusta este valor según tus necesidades
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20.0),
+                    border: Border.all(
+                      color: Colores.gris, // Cambia el color del borde a gris
+                      width: 1.0,
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Radio(
-                      value: true,
-                      groupValue: _isMasculino,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      hint: Text('Género'),
+                      value: genero,
+                      items: const [
+                        DropdownMenuItem(
+                          value: "masculino",
+                          child: Row(
+                            children: [
+                              Icon(Icons.male), // Icono de hombre
+                              SizedBox(width: 8.0),
+                              Text('Masculino'),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: "femenino",
+                          child: Row(
+                            children: [
+                              Icon(Icons.female), // Icono de mujer
+                              SizedBox(width: 8.0),
+                              Text('Femenino'),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: "otro",
+                          child: Row(
+                            children: [
+                              Icon(Icons.person), // Icono de persona
+                              SizedBox(width: 8.0),
+                              Text('Otro'),
+                            ],
+                          ),
+                        ),
+                      ],
                       onChanged: (value) {
                         setState(() {
-                          _isMasculino = value!;
+                          genero = value!;
                         });
                       },
                     ),
-                    const Text('Masculino'),
-                    Radio(
-                      value: false,
-                      groupValue: _isMasculino,
-                      onChanged: (value) {
-                        setState(() {
-                          _isMasculino = value!;
-                        });
-                      },
-                    ),
-                    const Text('Femenino'),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Contraseña',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                      borderSide: BorderSide(width: 1.0),
+                // const SizedBox(height: 16),
+                // TextField(
+                //   controller: _passwordController,
+                //   obscureText: true,
+                //   decoration: const InputDecoration(
+                //     labelText: 'Contraseña',
+                //     border: OutlineInputBorder(
+                //       borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                //       borderSide: BorderSide(width: 1.0),
+                //     ),
+                //   ),
+                // ),
+                // const SizedBox(height: 16),
+                // TextField(
+                //   controller: _confirmPasswordController,
+                //   obscureText: true,
+                //   decoration: const InputDecoration(
+                //     labelText: 'Confirmar Contraseña',
+                //     border: OutlineInputBorder(
+                //       borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                //       borderSide: BorderSide(width: 1.0),
+                //     ),
+                //   ),
+                // ),
+                // const SizedBox(height: 16),
+                // Row(
+                //   children: [
+                //     Checkbox(
+                //       value: _aceptoTerminos,
+                //       onChanged: (value) {
+                //         setState(() {
+                //           _aceptoTerminos = value!;
+                //         });
+                //       },
+                //     ),
+                //     const Text('Acepto los términos'),
+                //   ],
+                // ),
+
+                Container(
+                  margin: const EdgeInsets.only(
+                      top: 70.0), // Ajusta este valor según tus necesidades
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_nombreController.text.isEmpty ||
+                          _correoController.text.isEmpty ||
+                          (genero == null || genero!.isEmpty)) {
+                        MessageDialog(context,
+                            title: 'Alerta',
+                            description: 'Todos los campos deben estar llenos',
+                            onReadMore: () {
+                          Navigator.pop(context);
+                        }, buttonText: 'ACEPTAR', showCloseButton: false);
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NumeroUsuarioScreen(
+                              datosUsuario: {
+                                'nombre': _nombreController.text,
+                                'correo': _correoController.text,
+                                'genero': genero ??= '',
+                              },
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 31, 195, 146),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 16),
+                    ),
+                    child: Text(
+                      'Siguiente',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _confirmPasswordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Confirmar Contraseña',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                      borderSide: BorderSide(width: 1.0),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _aceptoTerminos,
-                      onChanged: (value) {
-                        setState(() {
-                          _aceptoTerminos = value!;
-                        });
-                      },
-                    ),
-                    const Text('Acepto los términos'),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: _registrarUsuario,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 31, 195, 146),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 32, vertical: 16),
-                  ),
-                  child: const Text('Registrar Usuario'),
-                ),
-                const SizedBox(height: 20),
               ],
             ),
           ),

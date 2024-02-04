@@ -7,12 +7,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/pantallas/principal.dart';
+import 'package:hyzar/utilidades/Colores.dart';
 import 'package:hyzar/utilidades/auth.dart';
 import 'package:flutter/cupertino.dart'; // Importa CupertinoAlertDialog para iOS
 import 'package:hyzar/auth/login/widgets/email_field.dart';
 import 'package:hyzar/auth/login/widgets/get_started_button.dart';
 import 'package:hyzar/auth/login/widgets/password_field.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
+import 'package:hyzar/utilidades/widgets/MessageDialog.dart';
 import 'package:provider/provider.dart';
 import '../register/registro.dart';
 
@@ -223,9 +225,12 @@ class _LoginScreenState extends State<LoginScreen>
       }
     } else {
       // Hubo un error al iniciar sesión, manejarlo adecuadamente.
-      String errorMessage =
-          "Ocurrió un error al iniciar sesión. Verifica tus credenciales.";
-      _showErrorDialog(errorMessage);
+      MessageDialog(context,
+          title: 'Error',
+          description: 'El usuario o la contraseña son incorrectos',
+          onReadMore: () {
+        Navigator.pop(context);
+      }, buttonText: 'ACEPTAR', showCloseButton: false);
       setState(() {
         _isLoading = false;
       });
@@ -243,7 +248,7 @@ class _LoginScreenState extends State<LoginScreen>
             angle: _animationController.value * 2 * pi,
             child: RepaintBoundary(
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage('lib/assets/HyzarLogoWB.png'),
                     fit: BoxFit.cover,
@@ -310,7 +315,7 @@ class _LoginScreenState extends State<LoginScreen>
                               const Text("Hyzar",
                                   style: TextStyle(
                                       fontSize: 34,
-                                      color: Color.fromARGB(255, 18, 136, 185),
+                                      color: Colores.verde,
                                       fontWeight: FontWeight.bold)),
                               const Text(
                                 "Inicia sesión para continuar",
