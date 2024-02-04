@@ -109,6 +109,7 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
         }
       } catch (e) {
         if (_passwordController.text.length < 8) {
+          // ignore: use_build_context_synchronously
           MessageDialog(context,
               title: "Alerta",
               description: "La contraseña debe tener al menos 8 caracteres",
@@ -116,6 +117,7 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
             Navigator.pop(context);
           }, showCloseButton: false);
         } else {
+          // ignore: use_build_context_synchronously
           MessageDialog(context,
               title: "Error",
               description: "Error al registrar el usuario: $e",
@@ -165,7 +167,6 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
                 const Text(
                   "Ingresa una contraseña de mínimo 8 caracteres",
@@ -176,35 +177,13 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
                   ),
                   textAlign: TextAlign.justify,
                 ),
-
                 const SizedBox(height: 16),
-                // TextField(
-                //   controller: _telefonoController,
-                //   decoration: const InputDecoration(
-                //     labelText: 'Teléfono',
-                //     enabledBorder: OutlineInputBorder(
-                //       borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                //       borderSide: BorderSide(
-                //         color: Colores.gris, // Cambia el color del borde a gris
-                //         width: 1.0,
-                //       ),
-                //     ),
-                //     focusedBorder: OutlineInputBorder(
-                //       borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                //       borderSide: BorderSide(
-                //         color: Colores.gris, // Cambia el color del borde a gris
-                //         width: 2.0,
-                //       ),
-                //     ),
-                //   ),
-                // ),
-
                 TextField(
                   controller: _passwordController,
                   obscureText: _obscureText,
                   decoration: InputDecoration(
                     labelText: 'Contraseña',
-                    border: OutlineInputBorder(
+                    border: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(20.0)),
                       borderSide: BorderSide(width: 1.0),
                     ),
@@ -219,7 +198,6 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
                 Text(
                   "Confirma tu contraseña",
                   style: TextStyle(
@@ -227,7 +205,6 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
                       fontWeight: FontWeight.bold,
                       color: Colores.gris),
                 ),
-
                 const SizedBox(height: 16),
                 TextField(
                   controller: _confirmPasswordController,
@@ -249,7 +226,7 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
                       Container(
                         margin: const EdgeInsets.only(
                             bottom: 20.0), // Margen inferior
-                        child: Text(
+                        child: const Text(
                           "Al registrarte aceptas los términos y condiciones de la aplicación",
                           style: TextStyle(
                             fontSize: 15,
@@ -267,7 +244,7 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 100, vertical: 16),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Registrarse',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
