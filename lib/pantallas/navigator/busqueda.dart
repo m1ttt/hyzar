@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
+import 'package:hyzar/utilidades/widgets/GenericHeader.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -85,6 +86,11 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
     return Scaffold(
       body: Column(
         children: [
+          GenericHeader(
+            icon: Icons.search,
+            title: "Buscar",
+            mostrarImagen: true,
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(

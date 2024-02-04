@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
+import 'package:hyzar/utilidades/widgets/GenericHeader.dart';
 import 'package:provider/provider.dart';
 
 class PantallaPerfil extends StatefulWidget {
@@ -58,28 +59,40 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
     var nombre = Provider.of<UserNotifier>(context).getNombre();
     File? image = Provider.of<UserNotifier>(context).getImage();
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false, // Agrega esta línea
-        title: Text('Perfil'),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(_estaEditando ? Icons.check : Icons.edit),
-            onPressed: () {
-              if (_estaEditando) {
-                // _actualizarPerfil();
-              } else {
-                setState(() {
-                  _estaEditando = true;
-                });
-              }
-            },
-          ),
-        ],
-      ),
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false, // Agrega esta línea
+      //   title: Text('Perfil'),
+      //   actions: <Widget>[
+      //     IconButton(
+      //       icon: Icon(_estaEditando ? Icons.check : Icons.edit),
+      //       onPressed: () {
+      //         if (_estaEditando) {
+      //           // _actualizarPerfil();
+      //         } else {
+      //           setState(() {
+      //             _estaEditando = true;
+      //           });
+      //         }
+      //       },
+      //     ),
+      //   ],
+      // ),
       body: ListView(
         controller: widget.controller,
         padding: const EdgeInsets.all(10),
         children: <Widget>[
+          GenericHeader(
+            icon: Icons.dataset,
+            title: "Opciones",
+            mostrarImagen: false,
+            boxShadow: BoxShadow(
+              color: Theme.of(context).colorScheme.background,
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: Offset(0, 3),
+            ),
+            padding: EdgeInsets.only(top: 0, left: 5, right: 5, bottom: 10),
+          ),
           ListTile(
             title: image != null
                 ? Image.file(

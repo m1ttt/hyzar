@@ -3,9 +3,11 @@
 import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/funciones/pedido.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/pedidos_confirm.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
+import 'package:hyzar/utilidades/widgets/GenericHeader.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../Detalles/detalle_medicamento.dart';
@@ -162,12 +164,23 @@ class _PantallaUSState extends State<PantallaUS>
               }
             }).toList();
 
-            return ListView.builder(
-              controller: _scrollController,
-              itemCount: children.length,
-              itemBuilder: (context, index) {
-                return children[index];
-              },
+            return Column(
+              children: [
+                const GenericHeader(
+                    icon: Icons.medication,
+                    title: "Productos",
+                    mostrarImagen: true),
+                Expanded(
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    controller: _scrollController,
+                    itemCount: children.length,
+                    itemBuilder: (context, index) {
+                      return children[index];
+                    },
+                  ),
+                ),
+              ],
             );
           },
         ),

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -13,9 +15,9 @@ class PasswordUsuarioscren extends StatefulWidget {
   final Map<String, String> datosUsuario;
 
   const PasswordUsuarioscren({
-    Key? key,
+    super.key,
     required this.datosUsuario,
-  }) : super(key: key);
+  });
   @override
   // ignore: library_private_types_in_public_api
   _PasswordUsuarioState createState() => _PasswordUsuarioState();
@@ -101,15 +103,18 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
             await _databaseReference.child(userID).update({"imagen": url});
           }
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Usuario registrado correctamente")),
-          );
+          MessageDialog(context,
+              title: "Correcto",
+              description:
+                  "Te has registrado correctamente, redirigiendote al inicio",
+              buttonText: "ACEPTAR", onReadMore: () {
+            Navigator.pop(context);
+          }, showCloseButton: false);
 
           Navigator.of(context).pushNamed('/login');
         }
       } catch (e) {
         if (_passwordController.text.length < 8) {
-          // ignore: use_build_context_synchronously
           MessageDialog(context,
               title: "Alerta",
               description: "La contraseña debe tener al menos 8 caracteres",
@@ -117,7 +122,6 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
             Navigator.pop(context);
           }, showCloseButton: false);
         } else {
-          // ignore: use_build_context_synchronously
           MessageDialog(context,
               title: "Error",
               description: "Error al registrar el usuario: $e",
@@ -198,7 +202,7 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Text(
+                const Text(
                   "Confirma tu contraseña",
                   style: TextStyle(
                       fontSize: 20,
