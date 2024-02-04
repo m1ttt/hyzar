@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/pantallas/navigator_admin/pedidos_admin/pedidos_admin.dart';
 import 'package:hyzar/pantallas/navigator_admin/usuarios/Usuarios.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
@@ -27,16 +28,16 @@ class _PrincipalUserState extends State<PrincipalUser> {
   late String email;
 
   late List<Widget> _childrenUsuario = [
-    PantallaUS(),
-    PantallaBusqueda(),
+    const PantallaUS(),
+    const PantallaBusqueda(),
     const PantallaPedidos(),
   ];
   late List<Widget> _childrenAdmin = [
-    PantallaUS(),
-    PantallaBusqueda(),
-    PedidosAdmin(),
+    const PantallaUS(),
+    const PantallaBusqueda(),
+    const PedidosAdmin(),
     UsuariosAdmin(),
-    PantallaAgregar(),
+    const PantallaAgregar(),
   ];
   final List<String> _titlesUsuario = ["Productos", "Búsqueda", "Pedidos"];
   final List<String> _titlesAdmin = [
@@ -98,16 +99,16 @@ class _PrincipalUserState extends State<PrincipalUser> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           _childrenUsuario = [
-            PantallaUS(),
-            PantallaBusqueda(),
+            const PantallaUS(),
+            const PantallaBusqueda(),
             const PantallaPedidos(),
           ];
           _childrenAdmin = [
-            PantallaUS(),
-            PantallaBusqueda(),
-            PedidosAdmin(),
+            const PantallaUS(),
+            const PantallaBusqueda(),
+            const PedidosAdmin(),
             UsuariosAdmin(),
-            PantallaAgregar(),
+            const PantallaAgregar(),
           ];
           List<Widget> children =
               tipoUsuario == 'admin' ? _childrenAdmin : _childrenUsuario;
@@ -177,19 +178,101 @@ class _PrincipalUserState extends State<PrincipalUser> {
               ],
             ),
             body: children[_currentIndex],
-            bottomNavigationBar: NavigationBar(
-              onDestinationSelected: (int index) {
-                setState(() {
-                  _currentIndex = index;
-                });
+            extendBody: true,
+            bottomNavigationBar: GestureDetector(
+              onVerticalDragUpdate: (details) {
+                if (details.delta.dy < 0) {
+                  // Si el deslizamiento es hacia arriba
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => DraggableScrollableSheet(
+                      initialChildSize: 0.5,
+                      minChildSize: 0.5,
+                      maxChildSize: 1,
+                      builder: (BuildContext context, myscrollController) {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(30),
+                            topRight: Radius.circular(30),
+                          ),
+                          child: Container(
+                            color: Theme.of(context).primaryColor,
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                  width: 40,
+                                  height: 5,
+                                  margin: EdgeInsets.only(top: 8, bottom: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colores.gris,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(12)),
+                                  ),
+                                ),
+                                Expanded(child: PantallaPerfil()),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
               },
-              selectedIndex: _currentIndex,
-              destinations: items
-                  .map((item) => NavigationDestination(
-                        icon: item.icon,
-                        label: item.label ?? '',
-                      ))
-                  .toList(),
+              child: Container(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(30),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      spreadRadius: 0.2,
+                      blurRadius: 5,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(30),
+                  ),
+                  child: Stack(
+                    alignment: Alignment.topCenter,
+                    children: <Widget>[
+                      NavigationBar(
+                        onDestinationSelected: (int index) {
+                          setState(() {
+                            _currentIndex = index;
+                          });
+                        },
+                        selectedIndex: _currentIndex,
+                        destinations: items
+                            .map((item) => NavigationDestination(
+                                  icon: item.icon,
+                                  label: item.label ?? '',
+                                ))
+                            .toList(),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            bottom:
+                                60), // Ajusta este valor según tus necesidades
+                        child: Container(
+                          width: 40,
+                          height: 5,
+                          margin: EdgeInsets.only(top: 8, bottom: 8),
+                          decoration: BoxDecoration(
+                            color: Colores.gris,
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           );
         } else if (snapshot.hasError) {

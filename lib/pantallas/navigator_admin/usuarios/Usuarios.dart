@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 import 'widget/UsuariosCard.dart';
 import 'widget/UsuariosInfo.dart';
 
@@ -62,10 +66,32 @@ class _UsuariosAdminState extends State<UsuariosAdmin> {
         });
       }
     }
-
-    // Si estadoFiltro es 'todos', no se hace ninguna acción específica aquí
+    for (var entry in datosPorUsuario.entries) {
+      String idUsuario = entry.key;
+      File? imagen = await obtenerImagen(idUsuario);
+      if (imagen != null) {
+        datosPorUsuario[idUsuario]!['imagen'] = imagen;
+      }
+    }
 
     return datosPorUsuario;
+    // Si estadoFiltro es 'todos', no se hace ninguna acción específica aquí
+  }
+
+  Future<File?> obtenerImagen(String idUsuario) async {
+    try {
+      final ref =
+          FirebaseStorage.instance.ref().child('user_images/$idUsuario');
+      final url = await ref.getDownloadURL();
+      final response = await http.get(Uri.parse(url));
+      final directory = await getTemporaryDirectory();
+      final file = File('${directory.path}/$idUsuario');
+      await file.writeAsBytes(response.bodyBytes);
+      return file;
+    } catch (e) {
+      // Si ocurre un error (por ejemplo, la imagen no existe), devolvemos null
+      return null;
+    }
   }
 
   @override
@@ -75,12 +101,12 @@ class _UsuariosAdminState extends State<UsuariosAdmin> {
         future: obtenerDatos(),
         builder: (BuildContext context,
             AsyncSnapshot<Map<String, Map<String, dynamic>>> snapshot) {
-          if (snapshot.hasError) {
-            return Text('Algo salió mal: ${snapshot.error}');
+          if (snapshot.connectionState != ConnectionState.done) {
+            return Center(child: CircularProgressIndicator());
           }
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+          if (snapshot.hasError) {
+            return Text('Algo salió mal: ${snapshot.error}');
           }
 
           if (snapshot.data == null || snapshot.data!.isEmpty) {
@@ -91,6 +117,15 @@ class _UsuariosAdminState extends State<UsuariosAdmin> {
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
               var entry = snapshot.data!.entries.elementAt(index);
+              ImageProvider<Object>? imagen;
+              if (entry.value['imagen'] != null) {
+                imagen = FileImage(entry.value['imagen']);
+              } else {
+                // Si la imagen es null, no podemos mostrar un icono con ImageProvider
+                // En su lugar, puedes usar una imagen predeterminada o dejarla en null
+                imagen = null;
+              }
+
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -109,6 +144,7 @@ class _UsuariosAdminState extends State<UsuariosAdmin> {
                   entry.value['total'] ?? 0.0,
                   entry.value['correo'],
                   entry.value['telefono'],
+                  imagen,
                 ),
               );
             },

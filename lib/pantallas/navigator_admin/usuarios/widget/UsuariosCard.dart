@@ -7,9 +7,10 @@ class UsuariosCard extends StatefulWidget {
   final double total;
   final String correo;
   final String telefono;
+  final ImageProvider? imagen;
 
-  UsuariosCard(
-      this.idUsuario, this.nombre, this.total, this.correo, this.telefono);
+  UsuariosCard(this.idUsuario, this.nombre, this.total, this.correo,
+      this.telefono, this.imagen);
 
   @override
   _UsuariosCardState createState() => _UsuariosCardState();
@@ -29,7 +30,10 @@ class _UsuariosCardState extends State<UsuariosCard> {
               leading: CircleAvatar(
                 radius: 30,
                 backgroundColor: Colors.grey,
-                child: Icon(Icons.person, size: 30, color: Colors.white),
+                backgroundImage: widget.imagen != null ? widget.imagen : null,
+                child: widget.imagen == null
+                    ? Icon(Icons.person, size: 30, color: Colors.white)
+                    : null,
               ),
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
