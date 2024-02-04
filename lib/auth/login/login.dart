@@ -14,7 +14,7 @@ import 'package:hyzar/auth/login/widgets/email_field.dart';
 import 'package:hyzar/auth/login/widgets/get_started_button.dart';
 import 'package:hyzar/auth/login/widgets/password_field.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
-import 'package:hyzar/utilidades/widgets/MessageDialog.dart';
+import 'package:hyzar/utilidades/widgets/ModalDialog.dart';
 import 'package:provider/provider.dart';
 import '../register/registro.dart';
 

@@ -9,8 +9,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hyzar/auth/register/numero.dart';
 import 'package:hyzar/estilos/Colores.dart';
-import 'package:hyzar/utilidades/widgets/MessageDialog.dart';
+import 'package:hyzar/utilidades/widgets/ModalDialog.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class RegistroUsuarioScreen extends StatefulWidget {
   const RegistroUsuarioScreen({super.key});
@@ -22,6 +23,7 @@ class RegistroUsuarioScreen extends StatefulWidget {
 
 class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   final picker = ImagePicker();
+  File? _imageFile;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final DatabaseReference _databaseReference =
       FirebaseDatabase.instance.ref().child("usuarios");
@@ -105,6 +107,21 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
     }
   }
 
+  Future<void> seleccionarImagen(ImageSource source) async {
+    try {
+      final pickedFile = await picker.pickImage(source: source);
+      setState(() {
+        if (pickedFile != null) {
+          _imageFile = File(pickedFile.path);
+        } else {
+          print('No se seleccionó ninguna imagen.');
+        }
+      });
+    } catch (e) {
+      print('Error al seleccionar imagen: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,8 +161,59 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                SvgPicture.asset('lib/assets/AgregarImagen.svg',
-                    width: 150, height: 150, color: Colores.gris),
+                GestureDetector(
+                  onTap: () {
+                    ImageSourceDialog(
+                      context,
+                      onSelectSource: (source) async {
+                        final pickedFile =
+                            await ImagePicker().pickImage(source: source);
+                        if (pickedFile != null) {
+                          final croppedFile = await ImageCropper().cropImage(
+                            sourcePath: pickedFile.path,
+                            aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+                            compressQuality: 100,
+                            maxWidth: 700,
+                            maxHeight: 700,
+                            compressFormat: ImageCompressFormat.jpg,
+                          );
+                          if (croppedFile != null) {
+                            setState(() {
+                              _imageFile = File(croppedFile.path);
+                            });
+                          }
+                        }
+                      },
+                      onDelete: _imageFile != null
+                          ? () {
+                              setState(() {
+                                _imageFile = null;
+                              });
+                            }
+                          : null,
+                    );
+                  },
+                  child: _imageFile == null
+                      ? SvgPicture.asset(
+                          'lib/assets/AgregarImagen.svg',
+                          width: 150,
+                          height: 150,
+                          color: Colores.gris,
+                        )
+                      : Center(
+                          child: Container(
+                            width: 150,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                              image: DecorationImage(
+                                image: FileImage(_imageFile!),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+                ),
                 const SizedBox(height: 20),
                 Center(
                   child: Text(
