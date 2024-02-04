@@ -199,27 +199,6 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // TextField(
-                //   controller: _telefonoController,
-                //   decoration: const InputDecoration(
-                //     labelText: 'Teléfono',
-                //     enabledBorder: OutlineInputBorder(
-                //       borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                //       borderSide: BorderSide(
-                //         color: Colores.gris, // Cambia el color del borde a gris
-                //         width: 1.0,
-                //       ),
-                //     ),
-                //     focusedBorder: OutlineInputBorder(
-                //       borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                //       borderSide: BorderSide(
-                //         color: Colores.gris, // Cambia el color del borde a gris
-                //         width: 2.0,
-                //       ),
-                //     ),
-                //   ),
-                // ),
-                // const SizedBox(height: 16),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 10.0),
                   height: 60.0, // Ajusta este valor según tus necesidades
@@ -274,45 +253,6 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                     ),
                   ),
                 ),
-                // const SizedBox(height: 16),
-                // TextField(
-                //   controller: _passwordController,
-                //   obscureText: true,
-                //   decoration: const InputDecoration(
-                //     labelText: 'Contraseña',
-                //     border: OutlineInputBorder(
-                //       borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                //       borderSide: BorderSide(width: 1.0),
-                //     ),
-                //   ),
-                // ),
-                // const SizedBox(height: 16),
-                // TextField(
-                //   controller: _confirmPasswordController,
-                //   obscureText: true,
-                //   decoration: const InputDecoration(
-                //     labelText: 'Confirmar Contraseña',
-                //     border: OutlineInputBorder(
-                //       borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                //       borderSide: BorderSide(width: 1.0),
-                //     ),
-                //   ),
-                // ),
-                // const SizedBox(height: 16),
-                // Row(
-                //   children: [
-                //     Checkbox(
-                //       value: _aceptoTerminos,
-                //       onChanged: (value) {
-                //         setState(() {
-                //           _aceptoTerminos = value!;
-                //         });
-                //       },
-                //     ),
-                //     const Text('Acepto los términos'),
-                //   ],
-                // ),
-
                 Container(
                   margin: const EdgeInsets.only(
                       top: 70.0), // Ajusta este valor según tus necesidades
