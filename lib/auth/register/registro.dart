@@ -8,7 +8,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hyzar/auth/register/numero.dart';
-import 'package:hyzar/utilidades/Colores.dart';
+import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/utilidades/widgets/MessageDialog.dart';
 import 'package:image_picker/image_picker.dart';
 

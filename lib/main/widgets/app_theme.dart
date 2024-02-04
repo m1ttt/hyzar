@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hyzar/utilidades/Colores.dart';
+import 'package:hyzar/estilos/Colores.dart';
 
 ThemeData buildThemeData(ColorScheme colorScheme) {
   print(colorScheme);

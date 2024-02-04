@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/pantallas/principal.dart';
-import 'package:hyzar/utilidades/Colores.dart';
+import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/utilidades/auth.dart';
 import 'package:flutter/cupertino.dart'; // Importa CupertinoAlertDialog para iOS
 import 'package:hyzar/auth/login/widgets/email_field.dart';

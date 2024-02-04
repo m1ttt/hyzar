@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hyzar/utilidades/Colores.dart';
+import 'package:hyzar/estilos/Colores.dart';
 
 class BottomSheetModel extends StatefulWidget {
   const BottomSheetModel({super.key});

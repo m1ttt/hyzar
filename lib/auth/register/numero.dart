@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hyzar/auth/register/password.dart';
-import 'package:hyzar/utilidades/Colores.dart';
+import 'package:hyzar/estilos/Colores.dart';
 import 'package:image_picker/image_picker.dart';
 
 class NumeroUsuarioScreen extends StatefulWidget {
