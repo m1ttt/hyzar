@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -105,6 +106,28 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         const SnackBar(content: Text("Debes aceptar los términos")),
       );
     }
+  }
+
+  String imageToBase64(File imageFile) {
+    final bytes = imageFile.readAsBytesSync();
+    return base64Encode(bytes);
+  }
+
+  void guardarDatos() {
+    String? imageBase64;
+    if (_imageFile != null) {
+      imageBase64 = imageToBase64(_imageFile!);
+    }
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return NumeroUsuarioScreen(
+        datosUsuario: {
+          'nombre': _nombreController.text,
+          'correo': _correoController.text,
+          'genero': genero ??= '',
+          'imagen': imageBase64 ?? '',
+        },
+      );
+    }));
   }
 
   Future<void> seleccionarImagen(ImageSource source) async {
@@ -335,19 +358,23 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                             onReadMore: () {
                           Navigator.pop(context);
                         }, buttonText: 'ACEPTAR', showCloseButton: false);
-                      } else {
-                        Navigator.push(
+                      } else if (_imageFile == null) {
+                        MessageDialog(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => NumeroUsuarioScreen(
-                              datosUsuario: {
-                                'nombre': _nombreController.text,
-                                'correo': _correoController.text,
-                                'genero': genero ??= '',
-                              },
-                            ),
-                          ),
+                          title: 'Alerta',
+                          description: '¿Estás seguro de continuar sin imagen?',
+                          onReadMore: () {
+                            guardarDatos();
+                          },
+                          buttonText: 'CONTINUAR',
+                          showCloseButton: true,
+                          buttonCancelText: "AGREGAR IMAGEN",
+                          onClose: () {
+                            Navigator.pop(context);
+                          },
                         );
+                      } else {
+                        guardarDatos();
                       }
                     },
                     style: ElevatedButton.styleFrom(

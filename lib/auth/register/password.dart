@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -5,6 +6,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hyzar/estilos/Colores.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class PasswordUsuarioscren extends StatefulWidget {
   final Map<String, String> datosUsuario;
@@ -23,20 +25,15 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final DatabaseReference _databaseReference =
       FirebaseDatabase.instance.ref().child("usuarios");
-
-  final TextEditingController _nombreController = TextEditingController();
-  final TextEditingController _correoController = TextEditingController();
-  final TextEditingController _telefonoController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
-  final bool _aceptoTerminos = false;
   String? genero;
 
   Future<String> subirImagen(File imagen, String codigo) async {
     try {
-      final ref = FirebaseStorage.instance.ref().child('$codigo');
+      final ref = FirebaseStorage.instance.ref().child('user_images/$codigo');
       final uploadTask = ref.putFile(imagen);
 
       final taskSnapshot = await uploadTask;
@@ -49,11 +46,21 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
     }
   }
 
+  Future<File> base64ToFile(String base64Image) async {
+    final decodedBytes = base64Decode(base64Image);
+    final directory = await getTemporaryDirectory();
+    final path = directory.path;
+    final file = File('$path/image.jpg');
+    await file.writeAsBytes(decodedBytes);
+    return file;
+  }
+
   void _registrarUsuario() async {
     Map<String, String> datosCompletos = {
       ...widget.datosUsuario,
       'password': _passwordController.text,
     };
+    print(datosCompletos);
     try {
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
@@ -70,6 +77,12 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
           "genero": datosCompletos["genero"],
           "tipo": "usuario",
         });
+
+        if (datosCompletos["imagen"] != null) {
+          File imagen = await base64ToFile(datosCompletos["imagen"]!);
+          String url = await subirImagen(imagen, userID);
+          await _databaseReference.child(userID).update({"imagen": url});
+        }
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Usuario registrado correctamente")),
@@ -125,7 +138,7 @@ class _PasswordUsuarioState extends State<PasswordUsuarioscren> {
                 ),
 
                 const SizedBox(height: 20),
-                Text(
+                const Text(
                   "Ingresa una contraseña de mínimo 8 caracteres",
                   style: TextStyle(
                     fontSize: 20,

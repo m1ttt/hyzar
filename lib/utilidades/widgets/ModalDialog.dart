@@ -38,9 +38,12 @@ void MessageDialog(
   required String title,
   required String description,
   required String buttonText,
+  String buttonCancelText = "CANCELAR",
   required VoidCallback onReadMore,
   bool showCloseButton = true,
+  Function()? onClose,
 }) {
+  onClose ??= () => Navigator.pop(context);
   showModalBottomSheet(
     context: context,
     builder: (BuildContext bc) {
@@ -71,10 +74,10 @@ void MessageDialog(
                     style: TextButton.styleFrom(
                         foregroundColor: Colors.transparent),
                     onPressed: () {
-                      Navigator.pop(context);
+                      onClose!();
                     },
                     child: Text(
-                      "CERRAR",
+                      buttonCancelText,
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.primary),
                     ),

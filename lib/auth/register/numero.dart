@@ -192,6 +192,7 @@ class _NumeroUsuarioState extends State<NumeroUsuarioScreen> {
                             "correo": widget.datosUsuario["correo"]!,
                             "telefono": _telefonoController.text,
                             "genero": widget.datosUsuario["genero"]!,
+                            "imagen": widget.datosUsuario["imagen"]!,
                           };
                           Navigator.push(
                             context,
