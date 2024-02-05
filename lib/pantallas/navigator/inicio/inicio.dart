@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/funciones/pedido.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/pedidos_confirm.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
-import 'package:hyzar/utilidades/widgets/generic_header.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../Detalles/detalle_medicamento.dart';
@@ -48,11 +47,6 @@ class _PantallaUSState extends State<PantallaUS>
   void initState() {
     super.initState();
     initUserType();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -191,7 +185,7 @@ class _PantallaUSState extends State<PantallaUS>
                     closedShape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(56 / 2)),
                     ),
-                    transitionDuration: Duration(milliseconds: 500),
+                    transitionDuration: const Duration(milliseconds: 500),
                     openBuilder: (BuildContext context, VoidCallback _) {
                       return PantallaPedidosConfirm(documentos: datosPedidos);
                     },
@@ -207,7 +201,7 @@ class _PantallaUSState extends State<PantallaUS>
                   );
                 } else {
                   // Manejar estados de carga o error aquí
-                  return CircularProgressIndicator();
+                  return const CircularProgressIndicator();
                 }
               },
             ),

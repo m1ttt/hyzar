@@ -1,6 +1,7 @@
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
-import 'package:hyzar/utilidades/widgets/generic_header.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,7 +9,7 @@ import 'package:vibration/vibration.dart';
 import '../Detalles/detalle_medicamento.dart';
 
 class PantallaBusqueda extends StatefulWidget {
-  const PantallaBusqueda({Key? key}) : super(key: key);
+  const PantallaBusqueda({super.key});
 
   @override
   _PantallaBusquedaState createState() => _PantallaBusquedaState();
@@ -96,7 +97,7 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
                       : value;
                 });
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Buscar medicamento",
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
@@ -131,7 +132,7 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
           ),
           Text(
             'Resultado del escaner: $bc_code_result',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
             ),
           ),
@@ -151,7 +152,7 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
                   return Text('Error: ${snapshot.error}');
                 }
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return const CircularProgressIndicator();
                 }
                 return ListView(
                   children:
@@ -161,7 +162,7 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
                     medicamento['codigo'] = document.id;
                     return Card(
                       child: ListTile(
-                        leading: Icon(Icons.medication_liquid),
+                        leading: const Icon(Icons.medication_liquid),
                         title: Text(
                           'Medicamento: ${medicamento['nombre'] ?? 'No hay datos'}',
                         ),
