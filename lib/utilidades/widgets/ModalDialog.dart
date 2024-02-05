@@ -102,6 +102,7 @@ void MessageDialog(
   );
 }
 
+// ignore: non_constant_identifier_names
 void ImageSourceDialog(
   BuildContext context, {
   required Function(ImageSource) onSelectSource,
