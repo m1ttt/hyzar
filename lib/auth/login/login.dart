@@ -218,6 +218,8 @@ class _LoginScreenState extends State<LoginScreen>
         if (userData != null && userData["tipo"] == "usuario") {
           // El usuario es un usuario normal
           print("Es un usuario");
+          File? _image = (await obtenerImagen(userID))!;
+          Provider.of<UserNotifier>(context, listen: false).setImage(_image);
           Provider.of<UserNotifier>(context, listen: false)
               .setEmail(user.email!);
           Provider.of<UserNotifier>(context, listen: false)
@@ -231,6 +233,7 @@ class _LoginScreenState extends State<LoginScreen>
         } else if (userData != null && userData["tipo"] == "admin") {
           // El usuario es un administrador
           print("Es un administrador");
+          File? _image = (await obtenerImagen(userID))!;
           Provider.of<UserNotifier>(context, listen: false)
               .setEmail(user.email!);
           Provider.of<UserNotifier>(context, listen: false)
@@ -240,6 +243,7 @@ class _LoginScreenState extends State<LoginScreen>
           Provider.of<UserNotifier>(context, listen: false).setUserID(userID);
           Provider.of<UserNotifier>(context, listen: false)
               .setNombre(userData["nombre"]);
+          Provider.of<UserNotifier>(context, listen: false).setImage(_image);
           // Aquí puedes realizar acciones específicas para los administradores
         } else {
           // El usuario no tiene el campo "tipo" definido o no es ni usuario ni admin

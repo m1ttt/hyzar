@@ -60,8 +60,25 @@ class GenericHeader extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   child: CircleAvatar(
                     radius: 20,
-                    backgroundImage: FileImage(
-                        Provider.of<UserNotifier>(context).getImage()),
+                    backgroundColor: Provider.of<UserNotifier>(context)
+                                .getImage() ==
+                            null
+                        ? Colors
+                            .grey // Si la imagen es null, el color de fondo es gris
+                        : Colors
+                            .transparent, // Si la imagen no es null, el color de fondo es transparente
+                    backgroundImage: Provider.of<UserNotifier>(context)
+                                .getImage() !=
+                            null
+                        ? FileImage(
+                            Provider.of<UserNotifier>(context).getImage())
+                        : null, // Si la imagen es null, no establezcas backgroundImage
+                    child: Provider.of<UserNotifier>(context).getImage() == null
+                        ? const Icon(
+                            Icons.person,
+                            color: Colors.white,
+                          ) // Si la imagen es null, muestra un ícono gris
+                        : null, // Si la imagen no es null, no establezcas child
                   ),
                 ),
               ),

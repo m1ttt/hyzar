@@ -143,43 +143,11 @@ class _PrincipalUserState extends State<PrincipalUser> {
             );
           }
           return Scaffold(
-            // appBar: AppBar(
-            //     automaticallyImplyLeading:
-            //         false, // Quitamos la flecha de retroceso
-            //     title: Text(titles[_currentIndex]),
-            //     actions: []
-            //     //   PopupMenuButton(
-            //     //     onSelected: (value) {
-            //     //       if (value == 'cerrarSesion') {
-            //     //         _cerrarSesion();
-            //     //       }
-            //     //       // if (value == 'perfil') {
-            //     //       //   Navigator.push(
-            //     //       //     context,
-            //     //       //     MaterialPageRoute(
-            //     //       //         builder: (BuildContext context,) => PantallaPerfil(
-            //     //       //         controller: myscrollController,
-            //     //       //       ),
-            //     //       //     ),
-            //     //       //   );
-            //     //       // }
-            //     //     },
-            //     //     itemBuilder: (BuildContext context) {
-            //     //       return [
-            //     //         const PopupMenuItem(
-            //     //           value: 'perfil',
-            //     //           child: Text('Perfil'),
-            //     //         ),
-            //     //         const PopupMenuItem(
-            //     //           value: 'cerrarSesion',
-            //     //           child: Text('Cerrar Sesión'),
-            //     //         ),
-            //     //       ];
-            //     //     },
-            //     //   ),
-            //     // ],
-            //     ),
-            body: children[_currentIndex],
+            body: Padding(
+              padding: const EdgeInsets.only(
+                  bottom: kBottomNavigationBarHeight + 60),
+              child: children[_currentIndex],
+            ),
             extendBody: true,
             bottomNavigationBar: GestureDetector(
               onVerticalDragUpdate: (details) {

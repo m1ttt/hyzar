@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
-import 'package:hyzar/utilidades/widgets/GenericHeader.dart';
+import 'package:hyzar/utilidades/widgets/generic_header.dart';
 import 'package:provider/provider.dart';
 
 class PantallaPerfil extends StatefulWidget {

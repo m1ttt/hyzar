@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
-import 'package:hyzar/utilidades/widgets/GenericHeader.dart';
+import 'package:hyzar/utilidades/widgets/generic_header.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
