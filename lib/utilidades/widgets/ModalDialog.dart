@@ -60,7 +60,7 @@ void MessageDialog(
             Container(height: 10),
             Text(
               description,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colores.gris,
                 fontSize: 18,
               ),
