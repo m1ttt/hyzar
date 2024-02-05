@@ -49,6 +49,14 @@ class _PrincipalUserState extends State<PrincipalUser> {
     "Agregar productos",
   ];
 
+  final List<IconData> _icons = [
+    Icons.store,
+    Icons.search,
+    Icons.insert_invitation_rounded,
+    Icons.people,
+    Icons.add,
+  ];
+
   @override
   void initState() {
     _loadUserTypeFuture = _loadUserType();
@@ -147,9 +155,10 @@ class _PrincipalUserState extends State<PrincipalUser> {
             appBar: PreferredSize(
                 preferredSize: const Size.fromHeight(100),
                 child: GenericHeader(
-                    icon: Icons.search,
-                    title: titles[_currentIndex],
-                    mostrarImagen: true, )),
+                  icon: _icons[_currentIndex],
+                  title: titles[_currentIndex],
+                  mostrarImagen: true,
+                )),
             body: Padding(
               padding: const EdgeInsets.only(
                   bottom: kBottomNavigationBarHeight + 60),

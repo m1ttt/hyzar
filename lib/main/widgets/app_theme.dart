@@ -5,10 +5,11 @@ import 'package:hyzar/estilos/Colores.dart';
 ThemeData buildThemeData(ColorScheme colorScheme) {
   print(colorScheme);
   ColorScheme updatedColorScheme = colorScheme.copyWith(
-      primary: Colores.verde,
-      secondary: Colores.azul,
-      surfaceTint: Colores.verde,
-      primaryContainer: Colores.verde);
+    primary: Colores.verde,
+    secondary: Colores.azul,
+    surfaceTint: Colores.verde,
+    primaryContainer: Colores.verde,
+  );
   return ThemeData(
     colorScheme: updatedColorScheme,
     brightness: updatedColorScheme.brightness,
