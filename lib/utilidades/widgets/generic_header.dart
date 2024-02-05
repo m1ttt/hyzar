@@ -23,7 +23,7 @@ class GenericHeader extends StatelessWidget {
       offset: Offset(0, 3),
     ), // Añade esta línea
     this.padding = const EdgeInsets.only(
-        top: 50, left: 10, right: 10, bottom: 2), // Añade esta línea
+        top: 50, left: 10, right: 10, bottom: 10), // Añade esta línea
   }) : super(key: key);
 
   @override
@@ -31,7 +31,6 @@ class GenericHeader extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.background,
-        boxShadow: [boxShadow], // Cambia esta línea
       ),
       child: Padding(
         padding: padding, // Cambia esta línea
@@ -39,13 +38,13 @@ class GenericHeader extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: 60,
+              size: 24,
               color: Colores.verde,
             ),
             Text(
               title,
               style: const TextStyle(
-                fontSize: 30,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Colores.verde,
               ),

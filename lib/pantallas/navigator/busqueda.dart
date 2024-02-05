@@ -86,11 +86,6 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
     return Scaffold(
       body: Column(
         children: [
-          GenericHeader(
-            icon: Icons.search,
-            title: "Buscar",
-            mostrarImagen: true,
-          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(

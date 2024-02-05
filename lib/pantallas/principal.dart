@@ -4,6 +4,7 @@ import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/pantallas/navigator_admin/pedidos_admin/pedidos_admin.dart';
 import 'package:hyzar/pantallas/navigator_admin/usuarios/Usuarios.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
+import 'package:hyzar/utilidades/widgets/generic_header.dart';
 import 'package:provider/provider.dart';
 import 'navigator/busqueda.dart';
 import 'navigator/inicio/inicio.dart';
@@ -143,6 +144,12 @@ class _PrincipalUserState extends State<PrincipalUser> {
             );
           }
           return Scaffold(
+            appBar: PreferredSize(
+                preferredSize: const Size.fromHeight(100),
+                child: GenericHeader(
+                    icon: Icons.search,
+                    title: titles[_currentIndex],
+                    mostrarImagen: true, )),
             body: Padding(
               padding: const EdgeInsets.only(
                   bottom: kBottomNavigationBarHeight + 60),
@@ -163,7 +170,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
                       maxChildSize: 0.9,
                       builder: (BuildContext context, myscrollController) {
                         return ClipRRect(
-                          borderRadius: BorderRadius.only(
+                          borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(30),
                             topRight: Radius.circular(30),
                           ),
@@ -174,8 +181,9 @@ class _PrincipalUserState extends State<PrincipalUser> {
                                 Container(
                                   width: 40,
                                   height: 5,
-                                  margin: EdgeInsets.only(top: 8, bottom: 8),
-                                  decoration: BoxDecoration(
+                                  margin:
+                                      const EdgeInsets.only(top: 8, bottom: 8),
+                                  decoration: const BoxDecoration(
                                     color: Colores.gris,
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(12)),
@@ -231,14 +239,14 @@ class _PrincipalUserState extends State<PrincipalUser> {
                             .toList(),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(
+                        padding: const EdgeInsets.only(
                             bottom:
                                 50), // Ajusta este valor según tus necesidades
                         child: Container(
                           width: 40,
                           height: 5,
-                          margin: EdgeInsets.only(top: 8, bottom: 8),
-                          decoration: BoxDecoration(
+                          margin: const EdgeInsets.only(top: 8, bottom: 8),
+                          decoration: const BoxDecoration(
                             color: Colores.gris,
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),

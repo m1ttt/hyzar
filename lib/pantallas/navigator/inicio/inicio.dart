@@ -162,24 +162,13 @@ class _PantallaUSState extends State<PantallaUS>
                 );
               }
             }).toList();
-
-            return Column(
-              children: [
-                const GenericHeader(
-                    icon: Icons.medication,
-                    title: "Productos",
-                    mostrarImagen: true),
-                Expanded(
-                  child: ListView.builder(
-                    padding: EdgeInsets.zero,
-                    controller: _scrollController,
-                    itemCount: children.length,
-                    itemBuilder: (context, index) {
-                      return children[index];
-                    },
-                  ),
-                ),
-              ],
+            return ListView.builder(
+              padding: EdgeInsets.zero,
+              controller: _scrollController,
+              itemCount: children.length,
+              itemBuilder: (context, index) {
+                return children[index];
+              },
             );
           },
         ),
