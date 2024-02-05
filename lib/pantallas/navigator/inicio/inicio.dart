@@ -127,28 +127,39 @@ class _PantallaUSState extends State<PantallaUS>
                           : null,
                       child: Card(
                         color: color,
-                        child: ListTile(
-                          leading:
-                              (data['imagen'] == null || data['imagen'] == '')
-                                  ? const Icon(
-                                      Icons.warning,
-                                      size: 60,
-                                      color: Colors.yellow,
-                                    )
-                                  : ClipRRect(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      child: CachedNetworkImage(
-                                        imageUrl: data['imagen'],
-                                        width: 60,
-                                        height: 60,
-                                        placeholder: (context, url) =>
-                                            const CircularProgressIndicator(),
-                                        errorWidget: (context, url, error) =>
-                                            const Icon(Icons.error),
-                                      ),
-                                    ),
-                          title: Text('${data['nombre']}'),
-                          subtitle: Text('Existencias: ${data['existencias']}'),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              height:
+                                  120, // Ajusta esto a la altura que desees para la imagen
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(15.0),
+                                ),
+                                image: DecorationImage(
+                                  image: (data['imagen'] == null ||
+                                          data['imagen'] == '')
+                                      ? const AssetImage(
+                                          'lib/assets/NoImagen.png') // Reemplaza esto con la ruta a tu imagen predeterminada
+                                      : CachedNetworkImageProvider(
+                                              data['imagen'])
+                                          as ImageProvider<Object>,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            Flexible(
+                              child: Container(
+                                color: Theme.of(context).colorScheme.background,
+                                child: ListTile(
+                                  title: Text('${data['nombre']}'),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -156,11 +167,17 @@ class _PantallaUSState extends State<PantallaUS>
                 );
               }
             }).toList();
-            return ListView.builder(
-              padding: EdgeInsets.zero,
+            return GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing:
+                    2.0, // Espacio entre las tarjetas en la dirección vertical
+                crossAxisSpacing:
+                    2.0, // Espacio entre las tarjetas en la dirección horizontal
+              ),
               controller: _scrollController,
               itemCount: children.length,
-              itemBuilder: (context, index) {
+              itemBuilder: (BuildContext context, int index) {
                 return children[index];
               },
             );

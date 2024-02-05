@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
@@ -92,7 +92,7 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
             child: TextField(
               onChanged: (value) {
                 setState(() {
-                  searchText = value.length > 0
+                  searchText = value.isNotEmpty
                       ? value[0].toUpperCase() + value.substring(1)
                       : value;
                 });
