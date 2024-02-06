@@ -1,6 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/pantallas/navigator/pdfscreen/funciones/generarpdf.dart';
+import 'package:hyzar/utilidades/widgets/ModalDialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PedidoCard extends StatefulWidget {
@@ -43,7 +47,7 @@ class _PedidoCardState extends State<PedidoCard> {
       return Container();
     }
     return Card(
-      margin: EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -51,16 +55,23 @@ class _PedidoCardState extends State<PedidoCard> {
           children: [
             ListTile(
               title: Text('Pedido ID: $pedidoID',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  style: const TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.bold)),
               subtitle: Row(
                 children: <Widget>[
-                  Text('Estado: '),
-                  Chip(
-                    label: Text(
-                      '$estado',
-                      style: TextStyle(color: Colors.white),
+                  const Text('Estado: '),
+                  Container(
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      color: Colores.verde,
+                      borderRadius: BorderRadius.circular(
+                          10), // Ajusta el radio del borde redondeado aquí
                     ),
-                    backgroundColor: Colors.blue,
+                    child: Text(
+                      estado,
+                      style:
+                          TextStyle(color: Theme.of(context).backgroundColor),
+                    ),
                   ),
                 ],
               ),
@@ -69,21 +80,25 @@ class _PedidoCardState extends State<PedidoCard> {
                 color: pagado ? Colors.green : Colors.red,
               ),
             ),
-
-            Divider(),
+            const Divider(
+              color: Colores.gris,
+            ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
                   InputChip(
-                    avatar: Icon(Icons.shopping_cart),
-                    label: Text('Productos'),
+                    avatar: Icon(
+                      Icons.shopping_cart,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
+                    label: const Text('Productos'),
                     onPressed: () {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: Text('Productos adquiridos'),
+                            title: const Text('Productos adquiridos'),
                             content: Column(
                               children: detallesProductos['productos']
                                   .entries
@@ -101,74 +116,65 @@ class _PedidoCardState extends State<PedidoCard> {
                       );
                     },
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   InputChip(
-                    avatar: Icon(Icons.print),
-                    label: Text('Imprimir PDF'),
+                    avatar: Icon(Icons.print,
+                        color: Theme.of(context).iconTheme.color),
+                    label: const Text('Imprimir PDF'),
                     onPressed: () async {
                       PdfUtils.generarPDF(detallesPedido, pedidoID, context);
                     },
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   InputChip(
-                    avatar: Icon(Icons.location_on),
-                    label: Text('Dirección'),
+                    avatar: Icon(
+                      Icons.location_on,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
+                    label: const Text('Dirección'),
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('Dirección de entrega'),
-                            content: Text(
-                                '${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}'),
-                            actions: [
-                              TextButton(
-                                child: Text('Abrir en Google Maps'),
-                                onPressed: () async {
-                                  final url =
-                                      'https://www.google.com/maps/search/?api=1&query=${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}';
-                                  if (await canLaunch(url)) {
-                                    await launch(url);
-                                  } else {
-                                    throw 'No se pudo abrir $url';
-                                  }
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                      MessageDialog(context,
+                          title: "Dirección de entrega",
+                          description:
+                              '${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}',
+                          buttonText: "ABRIR EN GOOGLE MAPS",
+                          onReadMore: () async {
+                        final url =
+                            'https://www.google.com/maps/search/?api=1&query=${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}';
+                        if (await canLaunch(url)) {
+                          await launch(url);
+                        } else {
+                          throw 'No se pudo abrir $url';
+                        }
+                      }, showCloseButton: false);
                     },
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   InputChip(
-                    avatar: Icon(Icons.receipt),
-                    label: Text('Facturación'),
+                    avatar: Icon(
+                      Icons.receipt,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
+                    label: const Text('Facturación'),
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('Método de pago'),
-                            content: Text(
-                                'Método de pago: ${detallesPedido['forma_pago']}'),
-                          );
-                        },
-                      );
+                      MessageDialog(context,
+                          title: "Método de pago",
+                          description:
+                              'Método de pago: ${detallesPedido['forma_pago']}',
+                          buttonText: 'ACEPTAR',
+                          onReadMore: () {},
+                          showCloseButton: false);
                     },
                   ),
                 ],
               ),
             ),
-// ...
-            Divider(),
+            const Divider(color: Colores.gris),
             ListTile(
               title: Text('Total: ${detallesPedido['total']}'),
             ),
-
             if (!pagado)
               ElevatedButton(
-                child: Text('Cancelar'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red, // background color
                   foregroundColor: Colors.white, // foreground color
@@ -178,11 +184,11 @@ class _PedidoCardState extends State<PedidoCard> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text('Confirmación'),
-                        content: Text('¿Seguro que quieres cancelar?'),
+                        title: const Text('Confirmación'),
+                        content: const Text('¿Seguro que quieres cancelar?'),
                         actions: <Widget>[
                           TextButton(
-                            child: Text('Sí'),
+                            child: const Text('Sí'),
                             onPressed: () {
                               FirebaseFirestore.instance
                                   .collection('pedidos')
@@ -194,7 +200,7 @@ class _PedidoCardState extends State<PedidoCard> {
                             },
                           ),
                           TextButton(
-                            child: Text('No'),
+                            child: const Text('No'),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
@@ -204,6 +210,7 @@ class _PedidoCardState extends State<PedidoCard> {
                     },
                   );
                 },
+                child: const Text('Cancelar'),
               ),
           ],
         ),

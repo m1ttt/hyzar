@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
+import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
@@ -97,37 +98,33 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
                       : value;
                 });
               },
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: "Buscar medicamento",
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: IconButton(
+                  icon: const Icon(
+                    Icons.qr_code_scanner_rounded,
+                    color: Colores.gris,
+                  ),
+                  onPressed: () async {
+                    var res = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SimpleBarcodeScannerPage(
+                            appBarTitle: 'Escanear Código',
+                            isShowFlashIcon: true,
+                          ),
+                        ));
+                    if (res is String) {
+                      bc_code_result = res;
+                      obtenerDatosMedicamento(bc_code_result);
+                    }
+                  },
+                ),
+                border: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
                 ),
               ),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromARGB(255, 0, 105, 243),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            ),
-            onPressed: () async {
-              var res = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SimpleBarcodeScannerPage(
-                      appBarTitle: 'Escanear Código',
-                      isShowFlashIcon: true,
-                    ),
-                  ));
-              if (res is String) {
-                bc_code_result = res;
-                obtenerDatosMedicamento(bc_code_result);
-              }
-            },
-            child: const Text(
-              'Escanear Código',
             ),
           ),
           Text(
@@ -137,75 +134,74 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
             ),
           ),
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: (searchText == "")
-                  ? FirebaseFirestore.instance
-                      .collection("medicamentos")
-                      .snapshots()
-                  : FirebaseFirestore.instance
-                      .collection("medicamentos")
-                      .where('nombre', isGreaterThanOrEqualTo: searchText)
-                      .where('nombre', isLessThan: searchText + '\uf8ff')
-                      .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                }
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
-                }
-                return ListView(
-                  children:
-                      snapshot.data!.docs.map((DocumentSnapshot document) {
-                    Map<String, dynamic> medicamento =
-                        document.data() as Map<String, dynamic>;
-                    medicamento['codigo'] = document.id;
-                    return Card(
-                      child: ListTile(
-                        leading: const Icon(Icons.medication_liquid),
-                        title: Text(
-                          'Medicamento: ${medicamento['nombre'] ?? 'No hay datos'}',
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                'Código: ${medicamento['codigo'] ?? 'No hay datos'}'),
-                            Text(
-                                'Descripción: ${medicamento['descripcion'] ?? 'No hay datos'}'),
-                            Text(
-                                'Existencias: ${medicamento['existencias'] ?? 'No hay datos'}'),
-                            Text(
-                                'Precio Farmacia: ${medicamento['precio_farm'] ?? 'No hay datos'}'),
-                            Text(
-                                'Precio Público: ${medicamento['precio_pub'] ?? 'No hay datos'}'),
-                            Text(medicamento['eliminado'] == 1
-                                ? 'Suspendido'
-                                : 'No suspendido')
-                          ],
-                        ),
-                        onTap: () {
-                          // Crear una copia del mapa de medicamentos y cambiar la clave 'codigo' a 'id'
-                          Map<String, dynamic> medicamentoConId =
-                              Map.from(medicamento);
-                          medicamentoConId['id'] =
-                              medicamentoConId.remove('codigo');
+            child: searchText.isNotEmpty
+                ? StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection("medicamentos")
+                        .where('nombre', isGreaterThanOrEqualTo: searchText)
+                        .where('nombre', isLessThan: searchText + '\uf8ff')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+                      return ListView(
+                        children: snapshot.data!.docs
+                            .map((DocumentSnapshot document) {
+                          Map<String, dynamic> medicamento =
+                              document.data() as Map<String, dynamic>;
+                          medicamento['codigo'] = document.id;
+                          return Card(
+                            child: ListTile(
+                              leading: const Icon(Icons.medication_liquid),
+                              title: Text(
+                                'Medicamento: ${medicamento['nombre'] ?? 'No hay datos'}',
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                      'Código: ${medicamento['codigo'] ?? 'No hay datos'}'),
+                                  Text(
+                                      'Descripción: ${medicamento['descripcion'] ?? 'No hay datos'}'),
+                                  Text(
+                                      'Existencias: ${medicamento['existencias'] ?? 'No hay datos'}'),
+                                  Text(
+                                      'Precio Farmacia: ${medicamento['precio_farm'] ?? 'No hay datos'}'),
+                                  Text(
+                                      'Precio Público: ${medicamento['precio_pub'] ?? 'No hay datos'}'),
+                                  Text(medicamento['eliminado'] == 1
+                                      ? 'Suspendido'
+                                      : 'No suspendido')
+                                ],
+                              ),
+                              onTap: () {
+                                // Crear una copia del mapa de medicamentos y cambiar la clave 'codigo' a 'id'
+                                Map<String, dynamic> medicamentoConId =
+                                    Map.from(medicamento);
+                                medicamentoConId['id'] =
+                                    medicamentoConId.remove('codigo');
 
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DetalleMedicamentoScreen(
-                                  medicamento: medicamentoConId,
-                                  userType: userType),
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        DetalleMedicamentoScreen(
+                                            medicamento: medicamentoConId,
+                                            userType: userType),
+                                  ),
+                                );
+                              },
                             ),
                           );
-                        },
-                      ),
-                    );
-                  }).toList(),
-                );
-              },
-            ),
+                        }).toList(),
+                      );
+                    },
+                  )
+                : Container(), // Muestra un contenedor vacío cuando no hay búsqueda
           ),
         ],
       ),

@@ -18,7 +18,7 @@ class PantallaPedidos extends StatefulWidget {
 class _PantallaPedidosState extends State<PantallaPedidos> {
   bool mostrarSoloPagados = false;
   EstadoFiltro estadoFiltro = EstadoFiltro.todos;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   bool _isScrolling = false;
   @override
   void initState() {
