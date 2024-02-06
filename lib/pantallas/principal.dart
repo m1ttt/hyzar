@@ -70,35 +70,14 @@ class _PrincipalUserState extends State<PrincipalUser> {
   }
 
   void _cerrarSesion() async {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Cerrar Sesión'),
-        content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Cerrar el diálogo
-            },
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop(); // Cerrar el diálogo
-              try {
-                await FirebaseAuth.instance.signOut();
-                // ignore: use_build_context_synchronously
-                Navigator.pushNamedAndRemoveUntil(
-                    context, '/login', (Route<dynamic> route) => false);
-              } catch (e) {
-                // Aquí puedes manejar cualquier error que pueda ocurrir al cerrar sesión
-              }
-            },
-            child: const Text('Aceptar'),
-          ),
-        ],
-      ),
-    );
+    try {
+      await FirebaseAuth.instance.signOut();
+      // ignore: use_build_context_synchronously
+      Navigator.pushNamedAndRemoveUntil(
+          context, '/login', (Route<dynamic> route) => false);
+    } catch (e) {
+      // Aquí puedes manejar cualquier error que pueda ocurrir al cerrar sesión
+    }
   }
 
   @override

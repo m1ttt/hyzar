@@ -1,9 +1,8 @@
 import 'dart:io';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
+import 'package:hyzar/utilidades/widgets/ModalDialog.dart';
 import 'package:hyzar/utilidades/widgets/generic_header.dart';
 import 'package:provider/provider.dart';
 
@@ -25,27 +24,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
   final _passwordController = TextEditingController();
   bool _estaEditando = false;
 
-  // void _actualizarPerfil() async {
-  //   try {
-  //     await widget.user.updateEmail(_emailController.text);
-  //     await widget.user.updatePassword(_passwordController.text);
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text('Perfil actualizado con éxito'),
-  //       ),
-  //     );
-  //     setState(() {
-  //       _estaEditando = false;
-  //     });
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text('Error al actualizar el perfil: $e'),
-  //       ),
-  //     );
-  //   }
-  // }
-
   @override
   void initState() {
     super.initState();
@@ -59,24 +37,6 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
     var nombre = Provider.of<UserNotifier>(context).getNombre();
     File? image = Provider.of<UserNotifier>(context).getImage();
     return Scaffold(
-      // appBar: AppBar(
-      //   automaticallyImplyLeading: false, // Agrega esta línea
-      //   title: Text('Perfil'),
-      //   actions: <Widget>[
-      //     IconButton(
-      //       icon: Icon(_estaEditando ? Icons.check : Icons.edit),
-      //       onPressed: () {
-      //         if (_estaEditando) {
-      //           // _actualizarPerfil();
-      //         } else {
-      //           setState(() {
-      //             _estaEditando = true;
-      //           });
-      //         }
-      //       },
-      //     ),
-      //   ],
-      // ),
       body: ListView(
         controller: widget.controller,
         padding: const EdgeInsets.all(10),
@@ -89,26 +49,37 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               color: Theme.of(context).colorScheme.background,
               spreadRadius: 5,
               blurRadius: 7,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
-            padding: EdgeInsets.only(top: 0, left: 5, right: 5, bottom: 10),
+            padding:
+                const EdgeInsets.only(top: 0, left: 5, right: 5, bottom: 10),
           ),
           ListTile(
-            title: image != null
-                ? Image.file(
-                    image,
-                    width: 100, // puedes ajustar el ancho como prefieras
-                    height: 100, // puedes ajustar la altura como prefieras
-                  )
-                : Text('No se ha cargado ninguna imagen'),
+            title: Center(
+              child: image != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: Image.file(
+                        image,
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : const Icon(
+                      Icons.warning,
+                      color: Colors.yellow,
+                      size: 24.0,
+                    ),
+            ),
           ),
           Card(
             child: ListTile(
-              leading: Icon(Icons.person),
+              leading: const Icon(Icons.mail),
               title: _estaEditando
                   ? TextField(
                       controller: _emailController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Correo del usuario',
                       ),
                     )
@@ -117,11 +88,11 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
           ),
           Card(
             child: ListTile(
-              leading: Icon(Icons.person),
+              leading: const Icon(Icons.person),
               title: _estaEditando
                   ? TextField(
                       controller: _emailController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Correo del usuario',
                       ),
                     )
@@ -130,17 +101,17 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
           ),
           Card(
             child: ListTile(
-              leading: Icon(Icons.person),
+              leading: const Icon(Icons.assignment_ind_outlined),
               title: _estaEditando
                   ? TextField(
                       controller: _emailController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Correo del usuario',
                       ),
                     )
                   : Text(
                       userID,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize:
                             12, // Ajusta este valor para cambiar el tamaño del texto
                       ),
@@ -150,17 +121,27 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
           if (_estaEditando)
             Card(
               child: ListTile(
-                leading: Icon(Icons.lock),
+                leading: const Icon(Icons.lock),
                 title: TextField(
                   controller: _passwordController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Contraseña',
                   ),
                   obscureText: true,
                 ),
               ),
             ),
-          SizedBox(height: 20),
+          const SizedBox(height: 40),
+          const Center(
+            child: Text(
+              "Más opciones de configuracion proximamente...",
+              style: TextStyle(
+                  color: Colores.gris,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 5),
           if (widget.onPrincipal != null)
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -170,11 +151,17 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               ),
               onPressed: () {
-                widget.onPrincipal!();
+                MessageDialog(
+                  context,
+                  title: "Alerta",
+                  description: "¿Estás seguro que quieres cerrar sesión?",
+                  buttonText: "CERRAR SESIÓN",
+                  onReadMore: () {
+                    widget.onPrincipal!();
+                  },
+                );
               },
-              child: const Text(
-                'Cerrar sesión',
-              ),
+              child: const Text('Cerrar sesión'),
             ),
         ],
       ),
