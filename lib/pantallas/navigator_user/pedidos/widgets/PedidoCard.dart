@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, library_private_types_in_public_api
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -13,11 +13,10 @@ class PedidoCard extends StatefulWidget {
   final String userID;
 
   const PedidoCard(
-      {Key? key,
+      {super.key,
       required this.detallesPedido,
       required this.pedidoID,
-      required this.userID})
-      : super(key: key);
+      required this.userID});
 
   @override
   _PedidoCardState createState() => _PedidoCardState();
@@ -79,9 +78,6 @@ class _PedidoCardState extends State<PedidoCard> {
                 pagado ? Icons.check_circle : Icons.cancel,
                 color: pagado ? Colors.green : Colors.red,
               ),
-            ),
-            const Divider(
-              color: Colores.gris,
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -171,12 +167,13 @@ class _PedidoCardState extends State<PedidoCard> {
             ),
             const Divider(color: Colores.gris),
             ListTile(
-              title: Text('Total: ${detallesPedido['total']}'),
+              leading: const Icon(Icons.attach_money), // Icono de dinero
+              title: Text('${detallesPedido['total']}'),
             ),
             if (!pagado)
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red, // background color
+                  backgroundColor: Colores.azul, // background color
                   foregroundColor: Colors.white, // foreground color
                 ),
                 onPressed: () {

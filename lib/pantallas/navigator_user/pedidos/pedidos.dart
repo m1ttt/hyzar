@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:hyzar/estilos/Colores.dart';
 import 'package:provider/provider.dart';
 
 import '../../../utilidades/backend/user_notifier.dart';
@@ -53,6 +55,7 @@ class _PantallaPedidosState extends State<PantallaPedidos> {
   Widget build(BuildContext context) {
     final userID = Provider.of<UserNotifier>(context).getUserID();
     print('ID del usuario: $userID');
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(5.0),
@@ -71,27 +74,62 @@ class _PantallaPedidosState extends State<PantallaPedidos> {
                   pedido?.data() as Map<String, dynamic>;
 
               if (datosPedido.isEmpty) {
-                return Center(child: Text('No haz hecho ningún pedido'));
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        'lib/assets/Empty.svg',
+                        height: 300,
+                      ),
+                      const Text(
+                        'No tienes pedidos',
+                        style: TextStyle(
+                            fontSize: 24,
+                            color:
+                                Colores.gris), // Ajusta el estilo como quieras
+                      ),
+                    ],
+                  ),
+                );
               }
 
-              return ListView.builder(
-                controller: _scrollController,
-                itemCount: datosPedido.length,
-                itemBuilder: (context, index) {
-                  String pedidoID = datosPedido.keys.elementAt(index);
-                  Map<String, dynamic> detallesPedido = datosPedido[pedidoID];
-                  if (estadoFiltro == EstadoFiltro.pagado &&
-                      !detallesPedido['pagado']) {
-                    return Container();
-                  } else if (estadoFiltro == EstadoFiltro.noPagado &&
-                      detallesPedido['pagado']) {
-                    return Container();
-                  }
-                  return PedidoCard(
-                      detallesPedido: detallesPedido,
-                      pedidoID: pedidoID,
-                      userID: userID);
-                },
+              return Column(
+                children: [
+                  Text(
+                    'Actualmente tienes ${datosPedido.length} pedidos',
+                    style: const TextStyle(
+                        fontSize: 24,
+                        color: Colores.gris), // Ajusta el estilo como quieras
+                  ),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: ListView.separated(
+                      controller: _scrollController,
+                      itemCount: datosPedido.length,
+                      separatorBuilder: (BuildContext context, int index) =>
+                          const Divider(
+                        color: Colores.gris,
+                      ),
+                      itemBuilder: (context, index) {
+                        String pedidoID = datosPedido.keys.elementAt(index);
+                        Map<String, dynamic> detallesPedido =
+                            datosPedido[pedidoID];
+                        if (estadoFiltro == EstadoFiltro.pagado &&
+                            !detallesPedido['pagado']) {
+                          return Container();
+                        } else if (estadoFiltro == EstadoFiltro.noPagado &&
+                            detallesPedido['pagado']) {
+                          return Container();
+                        }
+                        return PedidoCard(
+                            detallesPedido: detallesPedido,
+                            pedidoID: pedidoID,
+                            userID: userID);
+                      },
+                    ),
+                  ),
+                ],
               );
             },
           ),
