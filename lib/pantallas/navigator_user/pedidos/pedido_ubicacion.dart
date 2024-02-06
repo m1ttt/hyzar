@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:flutter_google_places_hoc081098/google_maps_webservice_places.dart';
+import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/pantallas/principal.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
@@ -170,7 +171,13 @@ class _DireccionScreenState extends State<DireccionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dirección del pedido'),
+        title: Text(
+          'Dirección del pedido',
+          style: TextStyle(
+            color: Colores.verde,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -255,6 +262,16 @@ class _DireccionScreenState extends State<DireccionScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 10),
+            const Padding(
+              padding:
+                  EdgeInsets.all(8.0), // Ajusta el valor según tus necesidades
+              child: Text(
+                "Al realizar un pedido, este se procesará y se enviará a la dirección proporcionada.",
+                style: TextStyle(color: Colores.gris),
+              ),
+            ),
+            SizedBox(height: 5),
             ElevatedButton(
               onPressed: () async {
                 bool confirm = await showDialog(
@@ -355,7 +372,25 @@ class _DireccionScreenState extends State<DireccionScreen> {
                   }
                 }
               },
-              child: Text('Realizar pedido'),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.shopping_cart), // Ícono de carrito de compras
+                  SizedBox(width: 10), // Espacio entre el ícono y el texto
+                  Text(
+                    'Realizar pedido',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ],
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colores.verde,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.all(15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
             ),
           ],
         ),

@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/pedido_ubicacion.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
+import 'package:hyzar/utilidades/widgets/ModalDialog.dart';
 import 'package:intl/intl.dart';
 
 import 'package:provider/provider.dart';
@@ -261,52 +262,62 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
                             const SizedBox(height: 60),
                             ElevatedButton(
                               onPressed: () {
-                                // Obtén el userId del UserNotifier
-
-                                final nombreUsuario = Provider.of<UserNotifier>(
-                                        context,
-                                        listen: false)
-                                    .getNombre();
-
-                                Map<String, dynamic> productos = {
-                                  for (int index = 0;
-                                      index < widget.documentos.length;
-                                      index++)
-                                    widget.documentos[index].id: {
-                                      'cantidad': contador[index],
-                                      'nombre': (widget.documentos[index].data()
-                                          as Map<String, dynamic>)['nombre'],
-                                    }
-                                };
-
-                                Map<String, dynamic> detallesPedido = {
-                                  'productos': productos,
-                                  'fechaActual': DateFormat("yyyy-MM-dd HH:mm")
-                                      .format(DateTime.now()),
-                                  'fechaPedido': fechaPedidoController.text,
-                                };
-
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DireccionScreen(
-                                      pedido: detallesPedido,
-                                      formaPago: formaPago!,
-                                      total: total,
-                                      nombreUsuario: nombreUsuario,
+                                if (fechaPedidoController.text.isEmpty ||
+                                    formaPago == null) {
+                                  MessageDialog(context,
+                                      title: "Alerta",
+                                      description:
+                                          "Llena todos los campos antes de continuar",
+                                      buttonText: "ACEPTAR", onReadMore: () {
+                                    Navigator.pop(context);
+                                  }, showCloseButton: false);
+                                } else {
+                                  final nombreUsuario =
+                                      Provider.of<UserNotifier>(context,
+                                              listen: false)
+                                          .getNombre();
+                                  Map<String, dynamic> productos = {
+                                    for (int index = 0;
+                                        index < widget.documentos.length;
+                                        index++)
+                                      widget.documentos[index].id: {
+                                        'cantidad': contador[index],
+                                        'nombre': (widget.documentos[index]
+                                                .data()
+                                            as Map<String, dynamic>)['nombre'],
+                                      }
+                                  };
+                                  Map<String, dynamic> detallesPedido = {
+                                    'productos': productos,
+                                    'fechaActual':
+                                        DateFormat("yyyy-MM-dd HH:mm")
+                                            .format(DateTime.now()),
+                                    'fechaPedido': fechaPedidoController.text,
+                                  };
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DireccionScreen(
+                                        pedido: detallesPedido,
+                                        formaPago: formaPago!,
+                                        total: total,
+                                        nombreUsuario: nombreUsuario,
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                }
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colores.verde,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.all(15),
+                                padding: const EdgeInsets.only(
+                                    right: 20, left: 20, top: 10, bottom: 10),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                               ),
-                              child: const Text('Confirmar pedido'),
+                              child: const Text('Siguiente',
+                                  style: TextStyle(fontSize: 20)),
                             ),
                           ],
                         ),

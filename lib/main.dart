@@ -6,6 +6,7 @@ import 'package:hyzar/main/widgets/app_theme.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(
@@ -46,6 +47,14 @@ class MyApp extends StatelessWidget {
           theme: buildThemeData(lightScheme), // Tema claro
           darkTheme: buildThemeData(darkScheme), // Tema oscuro
           home: const LoginScreen(),
+          localizationsDelegates: const [
+            // Agrega estas líneas
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('es', ''), // Español
+          ],
         );
       },
     );
