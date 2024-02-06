@@ -5,6 +5,7 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/pedido_ubicacion.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:intl/intl.dart';
@@ -21,7 +22,7 @@ class PantallaPedidosConfirm extends StatefulWidget {
 }
 
 class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   String? formaPago;
   List<int> contador = [];
   TextEditingController fechaPedidoController = TextEditingController();
@@ -45,7 +46,7 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Confirmar pedido'),
+        title: const Text('Carrito de compras'),
       ),
       body: Padding(
         padding: EdgeInsets.all(10.0),
@@ -59,21 +60,25 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
               return Card(
                 child: ListTile(
                   leading: data['imagen'] != null && data['imagen'].isNotEmpty
-                      ? Image.network(
-                          data['imagen'],
-                          width: 50, // Ancho de la imagen
-                          height: 50, // Altura de la imagen
-                          fit: BoxFit
-                              .cover, // Para mantener la relación de aspecto de la imagen
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                              25), // Ajusta el radio del borde redondeado aquí
+                          child: Image.network(
+                            data['imagen'],
+                            width: 50, // Ancho de la imagen
+                            height: 50, // Altura de la imagen
+                            fit: BoxFit
+                                .cover, // Para mantener la relación de aspecto de la imagen
+                          ),
                         )
-                      : Icon(Icons.warning, color: Colors.red),
+                      : const Icon(Icons.warning, color: Colors.red),
                   title: Text(data['nombre']),
                   subtitle: Text('Precio: ${data['precio_farm']}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: Icon(Icons.remove),
+                        icon: const Icon(Icons.remove),
                         onPressed: () {
                           setState(() {
                             contador[index]--;
@@ -91,7 +96,7 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
                       ),
                       Text('${contador[index]}'),
                       IconButton(
-                        icon: Icon(Icons.add),
+                        icon: const Icon(Icons.add),
                         onPressed: contador[index] < data['existencias']
                             ? () => setState(() => contador[index]++)
                             : null,
@@ -105,13 +110,16 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
                   children: [
-                    Chip(
-                      label: Text('$total pesos',
-                          style: TextStyle(fontSize: 15, color: Colors.white)),
-                      backgroundColor: Colors.blue,
-                      labelPadding: EdgeInsets.all(2.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colores.verde,
+                        borderRadius: BorderRadius.circular(
+                            10), // Ajusta el radio del borde redondeado aquí
+                      ),
+                      padding: EdgeInsets.all(5.0),
+                      child: Text(
+                        '$total pesos',
+                        style: TextStyle(fontSize: 15, color: Colors.white),
                       ),
                     ),
                     DateTimeField(

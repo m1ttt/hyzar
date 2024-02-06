@@ -101,6 +101,7 @@ class _DireccionScreenState extends State<DireccionScreen> {
     await Future.delayed(Duration(milliseconds: 100));
 
     try {
+      // ignore: use_build_context_synchronously
       Prediction? p = await PlacesAutocomplete.show(
           context: context,
           apiKey: kGoogleApiKey,
@@ -261,7 +262,7 @@ class _DireccionScreenState extends State<DireccionScreen> {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: Text('Confirmar pedido'),
-                      content: Text(
+                      content: const Text(
                           '¿Estás seguro de que quieres realizar este pedido?'),
                       actions: <Widget>[
                         TextButton(
