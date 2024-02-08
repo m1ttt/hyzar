@@ -6,6 +6,7 @@ import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/pantallas/principal.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
+// ignore: depend_on_referenced_packages
 import 'package:uuid/uuid.dart';
 
 const kGoogleApiKey =

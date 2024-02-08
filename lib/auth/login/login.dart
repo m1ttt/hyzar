@@ -71,6 +71,7 @@ class _LoginScreenState extends State<LoginScreen>
   late TextEditingController _passwordController;
   late AnimationController _animationController;
   final double _elementsOpacity = 1;
+  // ignore: unused_field
   StreamSubscription<User?>? _authStateChangesSubscription;
   bool loadingBallAppear = false;
 
