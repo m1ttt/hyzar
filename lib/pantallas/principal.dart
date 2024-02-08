@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/pantallas/navigator_admin/pedidos_admin/pedidos_admin.dart';
@@ -23,6 +24,7 @@ class PrincipalUser extends StatefulWidget {
 }
 
 class _PrincipalUserState extends State<PrincipalUser> {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   int _currentIndex = 0;
   late Future<void> _loadUserTypeFuture;
   late String tipoUsuario;
@@ -67,6 +69,12 @@ class _PrincipalUserState extends State<PrincipalUser> {
     tipoUsuario =
         Provider.of<UserNotifier>(context, listen: false).getUserType();
     email = Provider.of<UserNotifier>(context, listen: false).getEmail();
+
+    if (tipoUsuario == 'admin') {
+      _firebaseMessaging.subscribeToTopic('admin');
+    } else {
+      _firebaseMessaging.subscribeToTopic('user');
+    }
   }
 
   void _cerrarSesion() async {

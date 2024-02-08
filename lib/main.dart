@@ -6,18 +6,30 @@ import 'package:hyzar/main/widgets/app_theme.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  messaging.requestPermission();
+  messaging.getToken().then((token) {
+    print('Token de Firebase: $token');
+  });
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Mensaje recibido: ${message.notification?.body}');
+  });
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => UserNotifier('', '', '', '', null),
-      child: const MyApp(),
+      child: MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
 
   Widget _buildLoading() {
     return const Center(
