@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hyzar/estilos/Colores.dart';
 import 'package:image_picker/image_picker.dart';
 
 class DetalleMedicamentoScreen extends StatefulWidget {
@@ -123,16 +124,10 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Detalles del producto"),
+        title: const Text("Detalles del producto",
+            style:
+                TextStyle(fontWeight: FontWeight.bold, color: Colores.verde)),
         elevation: 0,
-        flexibleSpace: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              color: Color.fromARGB(255, 255, 255, 255).withOpacity(0.0),
-            ),
-          ),
-        ),
         actions: <Widget>[
           if (widget.userType == 'admin')
             IconButton(
@@ -197,48 +192,76 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
           Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;
           return Container(
-            padding: const EdgeInsets.all(16.0),
+            padding:
+                const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 16),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Card(
-                    child: ListTile(
-                      leading: const Icon(Icons.image),
-                      title: editing
-                          ? GestureDetector(
-                              onTap: _pickImage,
-                              child: _imageFile != null
-                                  ? Image.file(_imageFile!)
-                                  : const Text(
-                                      'Haz clic para seleccionar una imagen'),
-                            )
-                          : data['imagen'] != null
-                              ? Image.network(
-                                  data['imagen'],
-                                  loadingBuilder: (BuildContext context,
-                                      Widget child,
-                                      ImageChunkEvent? loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return CircularProgressIndicator(
-                                      value:
-                                          loadingProgress.expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  loadingProgress
-                                                      .expectedTotalBytes!
-                                              : null,
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Text(
-                                        'Error al cargar la imagen');
-                                  },
-                                )
-                              : const Text('No hay imagen disponible'),
-                    ),
+                  Center(
+                      child: Column(
+                    children: [
+                      Text(
+                        "Estos son los detalles del producto",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colores.gris,
+                            fontSize: 22),
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text("Desliza hacia abajo para ver más detalles",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colores.gris,
+                              fontSize: 14)),
+                    ],
+                  )),
+                  SizedBox(
+                    height: 12,
                   ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: editing
+                        ? GestureDetector(
+                            onTap: _pickImage,
+                            child: _imageFile != null
+                                ? Image.file(_imageFile!)
+                                : const Text(
+                                    'Haz clic para seleccionar una imagen'),
+                          )
+                        : data['imagen'] != null
+                            ? Image.network(
+                                data['imagen'],
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Text(
+                                      'Error al cargar la imagen');
+                                },
+                              )
+                            : const Text('No hay imagen disponible'),
+                  ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Text("Nombre del medicamento",
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: Colores.gris,
+                          fontWeight: FontWeight.bold)),
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.medication),
@@ -250,6 +273,14 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
                             ),
                     ),
                   ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Text("Descripción",
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: Colores.gris,
+                          fontWeight: FontWeight.bold)),
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.description),
@@ -261,13 +292,21 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
                             ),
                     ),
                   ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Text("Existencias",
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: Colores.gris,
+                          fontWeight: FontWeight.bold)),
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.inventory),
                       title: editing
                           ? TextField(controller: existenciasController)
                           : Text(
-                              'Existencias: ${data['existencias']}',
+                              '${data['existencias']} unidades',
                               style: const TextStyle(fontSize: 20),
                             ),
                     ),
@@ -284,13 +323,19 @@ class _DetalleMedicamentoScreenState extends State<DetalleMedicamentoScreen> {
                               ),
                       ),
                     ),
+                  SizedBox(height: 12),
+                  Text("Precio",
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: Colores.gris,
+                          fontWeight: FontWeight.bold)),
                   Card(
                     child: ListTile(
                       leading: const Icon(Icons.money),
                       title: editing
                           ? TextField(controller: precioPubController)
                           : Text(
-                              'Precio Público: ${data['precio_pub']}',
+                              '\$${data['precio_pub']} mxn',
                               style: const TextStyle(fontSize: 20),
                             ),
                     ),

@@ -177,35 +177,19 @@ class _PedidoCardState extends State<PedidoCard> {
                   foregroundColor: Colors.white, // foreground color
                 ),
                 onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Confirmación'),
-                        content: const Text('¿Seguro que quieres cancelar?'),
-                        actions: <Widget>[
-                          TextButton(
-                            child: const Text('Sí'),
-                            onPressed: () {
-                              FirebaseFirestore.instance
-                                  .collection('pedidos')
-                                  .doc(userID)
-                                  .update({
-                                pedidoID: FieldValue.delete(),
-                              });
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          TextButton(
-                            child: const Text('No'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  MessageDialog(context,
+                      title: "Confirmación",
+                      description:
+                          "¿Estas seguro que deseas cancelar el pedido?",
+                      buttonText: "CANCELAR", onReadMore: () async {
+                    FirebaseFirestore.instance
+                        .collection('pedidos')
+                        .doc(userID)
+                        .update({
+                      pedidoID: FieldValue.delete(),
+                    });
+                    Navigator.pop(context);
+                  }, buttonCancelText: "NO");
                 },
                 child: const Text('Cancelar'),
               ),

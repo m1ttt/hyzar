@@ -1138,6 +1138,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
+  spelling_number:
+    dependency: "direct main"
+    description:
+      name: spelling_number
+      sha256: "86076b2726abd51d7e63fcbd5193672d0b177adbf9f49df128d38c51be57adee"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
   sprintf:
     dependency: transitive
     description:

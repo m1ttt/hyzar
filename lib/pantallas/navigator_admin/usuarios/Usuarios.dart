@@ -1,9 +1,12 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'widget/UsuariosCard.dart';
@@ -12,6 +15,8 @@ import 'widget/UsuariosInfo.dart';
 enum EstadoFiltro { firestore, realtime }
 
 class UsuariosAdmin extends StatefulWidget {
+  const UsuariosAdmin({super.key});
+
   @override
   _UsuariosAdminState createState() => _UsuariosAdminState();
 }
@@ -31,7 +36,7 @@ class _UsuariosAdminState extends State<UsuariosAdmin> {
         Map<String, dynamic> pedidosUsuario =
             doc.data() as Map<String, dynamic>;
         for (var pedido in pedidosUsuario.values) {
-          double totalPedido = pedido['total'];
+          double totalPedido = (pedido['total'] as num).toDouble();
           if (datosPorUsuario.containsKey(idUsuario)) {
             if (datosPorUsuario[idUsuario] != null) {
               datosPorUsuario[idUsuario]!['total'] += totalPedido;
@@ -110,19 +115,46 @@ class _UsuariosAdminState extends State<UsuariosAdmin> {
           }
 
           if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return Text('No hay datos disponibles');
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                          SvgPicture.asset(
+                            'lib/assets/Empty.svg',
+                            height: 300,
+                          ),
+                          const SizedBox(height: 20), // Añade un espacio (20px
+                          const Text(
+                            'En este momento ningún usuario tiene adeudos',
+                            style: TextStyle(
+                                fontSize: 24,
+                                color: Colors.grey,
+                                fontWeight: FontWeight
+                                    .bold), // Ajusta el estilo como quieras
+                          ),
+                        ],
+                      )),
+                ],
+              ),
+            );
           }
 
           return ListView.builder(
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
               var entry = snapshot.data!.entries.elementAt(index);
+              // Si el total es 0, no mostramos este usuario
+              if (entry.value['total'] == 0.0) {
+                return Container(); // Devolvemos un contenedor vacío
+              }
               ImageProvider<Object>? imagen;
               if (entry.value['imagen'] != null) {
                 imagen = FileImage(entry.value['imagen']);
               } else {
-                // Si la imagen es null, no podemos mostrar un icono con ImageProvider
-                // En su lugar, puedes usar una imagen predeterminada o dejarla en null
                 imagen = null;
               }
 

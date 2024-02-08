@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hyzar/pantallas/navigator/pdfscreen/funciones/generarpdf.dart';
+import 'package:hyzar/utilidades/widgets/ModalDialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PedidosAdminCard extends StatefulWidget {
@@ -153,6 +154,27 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                                 .collection('pedidos')
                                 .doc(idUsuario)
                                 .update({'$pedidoID.pagado': !pagado});
+
+                            // Obtener el total del pedido
+                            DocumentSnapshot pedidoDoc = await FirebaseFirestore
+                                .instance
+                                .collection('pedidos')
+                                .doc(idUsuario)
+                                .get();
+                            double totalPedido =
+                                (pedidoDoc.get('$pedidoID.total') as num)
+                                    .toDouble();
+
+                            // Restar el total del pedido del total en la colección de pedidos
+                            double totalPedidos =
+                                (pedidoDoc.get('$pedidoID.total') as num)
+                                    .toDouble();
+                            await FirebaseFirestore.instance
+                                .collection('pedidos')
+                                .doc(idUsuario)
+                                .update({
+                              '$pedidoID.total': totalPedidos - totalPedido
+                            });
                           } else {
                             // Si actualizarExistencias devolvió false, no hacer nada más
                             return;
@@ -178,7 +200,10 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: InputChip(
-                          avatar: const Icon(Icons.shopping_cart),
+                          avatar: Icon(
+                            Icons.shopping_cart,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                           label: const Text('Productos'),
                           onPressed: () {
                             showDialog(
@@ -206,7 +231,10 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: InputChip(
-                          avatar: const Icon(Icons.print),
+                          avatar: Icon(
+                            Icons.print,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                           label: const Text('Imprimir PDF'),
                           onPressed: () {
                             PdfUtils.generarPDF(
@@ -217,57 +245,45 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: InputChip(
-                          avatar: const Icon(Icons.location_on),
+                          avatar: Icon(
+                            Icons.location_on,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                           label: const Text('Dirección'),
                           onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('Dirección de entrega'),
-                                  content: Text(
-                                      '${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}'),
-                                  actions: [
-                                    TextButton(
-                                      child: const Text('Abrir en Google Maps'),
-                                      onPressed: () async {
-                                        final url =
-                                            'https://www.google.com/maps/search/?api=1&query=${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}';
-                                        if (await canLaunch(url)) {
-                                          await launch(url);
-                                        } else {
-                                          throw 'No se pudo abrir $url';
-                                        }
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
+                            MessageDialog(context,
+                                title: "Dirección de entrega",
+                                description:
+                                    '${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}',
+                                buttonText: "ABRIR EN GOOGLE MAPS",
+                                onReadMore: () async {
+                              final url =
+                                  'https://www.google.com/maps/search/?api=1&query=${detallesPedido['direccion_pedido']['calle']}, ${detallesPedido['direccion_pedido']['ciudad']}, ${detallesPedido['direccion_pedido']['colonia']}, ${detallesPedido['direccion_pedido']['numero']}, ${detallesPedido['direccion_pedido']['zip_code']}';
+                              if (await canLaunch(url)) {
+                                await launch(url);
+                              } else {
+                                throw 'No se pudo abrir $url';
+                              }
+                            }, showCloseButton: false);
                           },
                         ),
                       ),
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: InputChip(
-                          avatar: const Icon(Icons.receipt),
+                          avatar: Icon(
+                            Icons.receipt,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                           label: const Text('Facturación'),
                           onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('Facturación'),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Text(
-                                          'Método de pago: ${detallesPedido['forma_pago']}'),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
+                            MessageDialog(context,
+                                title: "Método de pago",
+                                description:
+                                    'Método de pago: ${detallesPedido['forma_pago']}',
+                                buttonText: 'ACEPTAR',
+                                onReadMore: () {},
+                                showCloseButton: false);
                           },
                         ),
                       ),
@@ -283,45 +299,34 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: Text('Total: ${detallesPedido['total']}\$'),
+                  title: Text(detallesPedido['total'] == 0
+                      ? 'Total: (pagado)'
+                      : 'Total: ${detallesPedido['total']}\$'),
                 ),
                 ElevatedButton(
-                  child: const Text('Cancelar'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red, // background color
                     foregroundColor: Colors.white, // foreground color
                   ),
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Confirmación'),
-                          content: const Text('¿Seguro que quieres cancelar?'),
-                          actions: <Widget>[
-                            TextButton(
-                              child: const Text('Sí'),
-                              onPressed: () {
-                                FirebaseFirestore.instance
-                                    .collection('pedidos')
-                                    .doc(idUsuario)
-                                    .update({
-                                  pedidoID: FieldValue.delete(),
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            TextButton(
-                              child: const Text('No'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                    MessageDialog(context,
+                        title: "Alerta",
+                        description: detallesPedido["total"] == 0
+                            ? "¿Estás seguro de querer eliminar el registro?\n NO SE PODRA RECUPERAR"
+                            : "¿Estás seguro de querer cancelar?",
+                        buttonText: "CANCELAR", onReadMore: () async {
+                      FirebaseFirestore.instance
+                          .collection('pedidos')
+                          .doc(idUsuario)
+                          .update({
+                        pedidoID: FieldValue.delete(),
+                      });
+                      Navigator.of(context).pop();
+                    }, buttonCancelText: "NO");
                   },
+                  child: Text(detallesPedido['total'] == 0
+                      ? 'Eliminar registro'
+                      : 'Cancelar'),
                 ),
               ],
             ),

@@ -5,6 +5,7 @@ import 'package:flutter_google_places_hoc081098/google_maps_webservice_places.da
 import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/pantallas/principal.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
+import 'package:hyzar/utilidades/widgets/ModalDialog.dart';
 import 'package:provider/provider.dart';
 // ignore: depend_on_referenced_packages
 import 'package:uuid/uuid.dart';
@@ -275,32 +276,10 @@ class _DireccionScreenState extends State<DireccionScreen> {
             SizedBox(height: 5),
             ElevatedButton(
               onPressed: () async {
-                bool confirm = await showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Confirmar pedido'),
-                      content: const Text(
-                          '¿Estás seguro de que quieres realizar este pedido?'),
-                      actions: <Widget>[
-                        TextButton(
-                          child: Text('Cancelar'),
-                          onPressed: () {
-                            Navigator.of(context).pop(false);
-                          },
-                        ),
-                        TextButton(
-                          child: Text('Confirmar'),
-                          onPressed: () {
-                            Navigator.of(context).pop(true);
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-                // Asegúrate de que todos los campos estén llenos
-                if (confirm) {
+                MessageDialog(context,
+                    title: "Confirmación",
+                    description: "¿Estás seguro que quieres hacer el pedido?",
+                    buttonText: "ACEPTAR", onReadMore: () async {
                   if (calle.isNotEmpty &&
                       numero.isNotEmpty &&
                       colonia.isNotEmpty &&
@@ -364,14 +343,14 @@ class _DireccionScreenState extends State<DireccionScreen> {
                       (Route<dynamic> route) => false,
                     );
                   } else {
-                    // Muestra un mensaje de error si algún campo está vacío
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content:
-                              Text('Por favor, completa todos los campos')),
-                    );
+                    MessageDialog(context,
+                        title: "Error",
+                        description: "Por favor, rellena todos los campos",
+                        buttonText: "ACEPTAR", onReadMore: () {
+                      Navigator.pop(context);
+                    });
                   }
-                }
+                });
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,

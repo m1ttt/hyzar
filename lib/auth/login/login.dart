@@ -146,6 +146,12 @@ class _LoginScreenState extends State<LoginScreen>
     try {
       final ref =
           FirebaseStorage.instance.ref().child('user_images/$idUsuario');
+      final exists =
+          await ref.getMetadata().then((_) => true).catchError((_) => false);
+      if (!exists) {
+        // El archivo no existe, devolvemos null
+        return null;
+      }
       final url = await ref.getDownloadURL();
       final response = await http.get(Uri.parse(url));
       final directory = await getTemporaryDirectory();

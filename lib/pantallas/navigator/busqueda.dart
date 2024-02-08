@@ -85,9 +85,42 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
 
   @override
   Widget build(BuildContext context) {
+    Stream<QuerySnapshot> stream;
+
+    if (searchText.isNotEmpty && bc_code_result.isNotEmpty) {
+      stream = FirebaseFirestore.instance
+          .collection("medicamentos")
+          .where('nombre',
+              isGreaterThanOrEqualTo: searchText,
+              isLessThan: searchText + '\uf8ff')
+          .where('codigo', isEqualTo: bc_code_result)
+          .snapshots();
+    } else if (searchText.isNotEmpty) {
+      stream = FirebaseFirestore.instance
+          .collection("medicamentos")
+          .where('nombre',
+              isGreaterThanOrEqualTo: searchText,
+              isLessThan: searchText + '\uf8ff')
+          .snapshots();
+    } else if (bc_code_result.isNotEmpty) {
+      stream = FirebaseFirestore.instance
+          .collection("medicamentos")
+          .where('codigo', isEqualTo: bc_code_result)
+          .snapshots();
+    } else {
+      stream = Stream.empty();
+    }
+
     return Scaffold(
       body: Column(
         children: [
+          SizedBox(height: 3), // Añade un espacio (20px)
+          const Text(
+            "Prueba buscando algún producto",
+            style: TextStyle(
+                fontSize: 20, color: Colores.gris, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 10), // Añade un espacio (20px)
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
@@ -99,7 +132,7 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
                 });
               },
               decoration: InputDecoration(
-                labelText: "Buscar medicamento",
+                labelText: "Buscar producto",
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: IconButton(
                   icon: const Icon(
@@ -130,78 +163,79 @@ class _PantallaBusquedaState extends State<PantallaBusqueda> {
           Text(
             'Resultado del escaner: $bc_code_result',
             style: const TextStyle(
-              fontSize: 14,
-            ),
+                fontSize: 14, color: Colores.gris, fontWeight: FontWeight.bold),
           ),
           Expanded(
-            child: searchText.isNotEmpty
-                ? StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection("medicamentos")
-                        .where('nombre', isGreaterThanOrEqualTo: searchText)
-                        .where('nombre', isLessThan: searchText + '\uf8ff')
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      }
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
-                      return ListView(
-                        children: snapshot.data!.docs
-                            .map((DocumentSnapshot document) {
-                          Map<String, dynamic> medicamento =
-                              document.data() as Map<String, dynamic>;
-                          medicamento['codigo'] = document.id;
-                          return Card(
-                            child: ListTile(
-                              leading: const Icon(Icons.medication_liquid),
-                              title: Text(
-                                'Medicamento: ${medicamento['nombre'] ?? 'No hay datos'}',
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                      'Código: ${medicamento['codigo'] ?? 'No hay datos'}'),
-                                  Text(
-                                      'Descripción: ${medicamento['descripcion'] ?? 'No hay datos'}'),
-                                  Text(
-                                      'Existencias: ${medicamento['existencias'] ?? 'No hay datos'}'),
-                                  Text(
-                                      'Precio Farmacia: ${medicamento['precio_farm'] ?? 'No hay datos'}'),
-                                  Text(
-                                      'Precio Público: ${medicamento['precio_pub'] ?? 'No hay datos'}'),
-                                  Text(medicamento['eliminado'] == 1
-                                      ? 'Suspendido'
-                                      : 'No suspendido')
-                                ],
-                              ),
-                              onTap: () {
-                                // Crear una copia del mapa de medicamentos y cambiar la clave 'codigo' a 'id'
-                                Map<String, dynamic> medicamentoConId =
-                                    Map.from(medicamento);
-                                medicamentoConId['id'] =
-                                    medicamentoConId.remove('codigo');
+            child: StreamBuilder<QuerySnapshot>(
+              stream: stream,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+                return ListView(
+                  children:
+                      snapshot.data?.docs.map((DocumentSnapshot document) {
+                            Map<String, dynamic> medicamento =
+                                document.data() as Map<String, dynamic>;
+                            medicamento['codigo'] = document.id;
+                            return Card(
+                              child: ListTile(
+                                leading: const Icon(Icons.medication_liquid),
+                                title: Text(
+                                  '${medicamento['nombre'] ?? 'No hay datos'}',
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        'Código: ${medicamento['codigo'] ?? 'No hay datos'}'),
+                                    Text(
+                                        'Descripción: ${medicamento['descripcion'] ?? 'No hay datos'}'),
+                                    Text(
+                                        'Existencias: ${medicamento['existencias'] ?? 'No hay datos'}'),
+                                    userType == 'admin'
+                                        ? Text(
+                                            'Precio Farmacia: ${medicamento['precio_farm'] ?? 'No hay datos'}')
+                                        : SizedBox.shrink(),
+                                    Text(
+                                      userType == 'admin'
+                                          ? 'Precio Público: ${medicamento['precio_pub'] ?? 'No hay datos'}'
+                                          : 'Precio: ${medicamento['precio_pub'] ?? 'No hay datos'}',
+                                    ),
+                                    userType == 'admin'
+                                        ? Text(medicamento['eliminado'] == 1
+                                            ? 'Suspendido'
+                                            : 'No suspendido')
+                                        : SizedBox.shrink(),
+                                  ],
+                                ),
+                                onTap: () {
+                                  // Crear una copia del mapa de medicamentos y cambiar la clave 'codigo' a 'id'
+                                  Map<String, dynamic> medicamentoConId =
+                                      Map.from(medicamento);
+                                  medicamentoConId['id'] =
+                                      medicamentoConId.remove('codigo');
 
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        DetalleMedicamentoScreen(
-                                            medicamento: medicamentoConId,
-                                            userType: userType),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    },
-                  )
-                : Container(), // Muestra un contenedor vacío cuando no hay búsqueda
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          DetalleMedicamentoScreen(
+                                              medicamento: medicamentoConId,
+                                              userType: userType),
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          }).toList() ??
+                          [],
+                );
+              },
+            ),
           ),
         ],
       ),

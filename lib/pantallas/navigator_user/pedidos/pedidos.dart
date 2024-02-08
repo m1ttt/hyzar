@@ -82,12 +82,14 @@ class _PantallaPedidosState extends State<PantallaPedidos> {
                         'lib/assets/Empty.svg',
                         height: 300,
                       ),
+                      SizedBox(height: 5), // Añade un espacio (20px)
                       const Text(
                         'No tienes pedidos',
                         style: TextStyle(
                             fontSize: 24,
-                            color:
-                                Colores.gris), // Ajusta el estilo como quieras
+                            color: Colores.gris,
+                            fontWeight: FontWeight
+                                .bold), // Ajusta el estilo como quieras
                       ),
                     ],
                   ),

@@ -42,7 +42,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
   ];
   final List<String> _titlesUsuario = ["Productos", "Búsqueda", "Pedidos"];
   final List<String> _titlesAdmin = [
-    "Productos en linea",
+    "Productos en línea",
     "Búsqueda de productos",
     "Pedidos actuales",
     "Deudas de usuarios",
@@ -140,7 +140,7 @@ class _PrincipalUserState extends State<PrincipalUser> {
                 )),
             body: Padding(
               padding: const EdgeInsets.only(
-                  bottom: kBottomNavigationBarHeight + 60),
+                  bottom: kBottomNavigationBarHeight + 20),
               child: children[_currentIndex],
             ),
             extendBody: true,

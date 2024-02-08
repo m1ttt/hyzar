@@ -1,6 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:hyzar/estilos/Colores.dart';
+import 'package:hyzar/utilidades/widgets/ModalDialog.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
@@ -88,7 +92,12 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
           .doc(codigo)
           .set(datos);
     } catch (e) {
-      print('Error al agregar medicamento: $e');
+      MessageDialog(context,
+          title: "Error",
+          description: "Error al agregar el medicamento $e",
+          buttonText: "ACEPTAR", onReadMore: () {
+        Navigator.pop(context);
+      }, showCloseButton: false);
     }
   }
 
@@ -114,45 +123,117 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
+              GestureDetector(
+                onTap: () {
+                  ImageSourceDialog(
+                    context,
+                    onSelectSource: (source) async {
+                      final pickedFile =
+                          await ImagePicker().pickImage(source: source);
+                      if (pickedFile != null) {
+                        final croppedFile = await ImageCropper().cropImage(
+                          sourcePath: pickedFile.path,
+                          aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+                          compressQuality: 100,
+                          maxWidth: 700,
+                          maxHeight: 700,
+                          compressFormat: ImageCompressFormat.jpg,
+                        );
+                        if (croppedFile != null) {
+                          setState(() {
+                            _imageFile = File(croppedFile.path);
+                          });
+                        }
+                      }
+                    },
+                    onDelete: _imageFile != null
+                        ? () {
+                            setState(() {
+                              _imageFile = null;
+                            });
+                          }
+                        : null,
+                  );
+                },
+                child: _imageFile == null
+                    ? SvgPicture.asset(
+                        'lib/assets/AgregarImagen.svg',
+                        width: 150,
+                        height: 150,
+                        color: Colores.gris,
+                      )
+                    : Center(
+                        child: Container(
+                          width: 150,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            image: DecorationImage(
+                              image: FileImage(_imageFile!),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+              ),
+              SizedBox(height: 20),
+              Text("Agregar medicamento",
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colores.gris)),
+              SizedBox(height: 5),
+              Text("Continua deslizando para ver más opciones",
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colores.gris)),
+              SizedBox(height: 20),
               Card(
                 child: TextField(
-                  controller: codigoController,
-                  decoration: const InputDecoration(
-                    labelText: 'Código de barras',
-                    prefixIcon: Icon(Icons.qr_code_scanner),
+                  onChanged: (value) {
+                    setState(() {
+                      codigoController.text = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: "Código",
+                    prefixIcon: IconButton(
+                      icon: const Icon(
+                        Icons.qr_code_scanner_rounded,
+                        color: Colores.gris,
+                      ),
+                      onPressed: () async {
+                        var res = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const SimpleBarcodeScannerPage(
+                                appBarTitle: 'Escanear Código',
+                                isShowFlashIcon: true,
+                              ),
+                            ));
+                        if (res is String) {
+                          codigoController.text = res;
+                        }
+                      },
+                    ),
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                    ),
                   ),
                   keyboardType: TextInputType.number,
                 ),
               ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: const Color.fromARGB(255, 18, 136, 185),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                ),
-                onPressed: () async {
-                  var res = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SimpleBarcodeScannerPage(),
-                      ));
-                  if (res is String) {
-                    codigoController.text = res;
-                  }
-                },
-                child: const Text(
-                  'Escanear Código',
-                ),
-              ),
-              const SizedBox(height: 10),
               Card(
                 child: TextField(
                   controller: existenciasController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Existencias',
                     prefixIcon: Icon(Icons.add_shopping_cart),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
                   ),
                   keyboardType: TextInputType.number,
                 ),
@@ -160,27 +241,38 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
               Card(
                 child: TextField(
                   controller: nombreController,
-                  decoration: const InputDecoration(
+                  textCapitalization: TextCapitalization.words,
+                  decoration: InputDecoration(
                     labelText: 'Nombre del producto',
                     prefixIcon: Icon(Icons.medication_rounded),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
                   ),
                 ),
               ),
               Card(
                 child: TextField(
+                  textCapitalization: TextCapitalization.words,
                   controller: descripcionController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Descripción',
                     prefixIcon: Icon(Icons.description),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
                   ),
                 ),
               ),
               Card(
                 child: TextField(
                   controller: precioFarmController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Precio Farmacia',
                     prefixIcon: Icon(Icons.monetization_on),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
                   ),
                   keyboardType: TextInputType.number,
                 ),
@@ -188,9 +280,12 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
               Card(
                 child: TextField(
                   controller: precioPubController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Precio Público',
                     prefixIcon: Icon(Icons.monetization_on),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
                   ),
                   keyboardType: TextInputType.number,
                 ),
@@ -201,90 +296,70 @@ class _PantallaAgregarState extends State<PantallaAgregar> {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          Map<String, dynamic> datosMedicamento = {
-                            'nombre': capitalize(nombreController.text),
-                            'descripcion': descripcionController.text,
-                            'existencias':
-                                int.parse(existenciasController.text),
-                            'precio_farm':
-                                double.parse(precioFarmController.text),
-                            'precio_pub':
-                                double.parse(precioPubController.text),
-                            'eliminado': 0,
-                          };
-                          await agregarMedicamento(codigoController.text,
-                              datosMedicamento, _imageFile);
-
-                          // Vaciar los campos
-                          codigoController.clear();
-                          existenciasController.clear();
-                          nombreController.clear();
-                          descripcionController.clear();
-                          precioFarmController.clear();
-                          precioPubController.clear();
-
-                          // Mostrar un mensaje
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Medicamento subido con éxito'),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          'Subir',
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          showModalBottomSheet(
-                              context: context,
-                              builder: (BuildContext bc) {
-                                return SafeArea(
-                                  child: Container(
-                                    child: Wrap(
-                                      children: <Widget>[
-                                        ListTile(
-                                          leading:
-                                              const Icon(Icons.photo_library),
-                                          title: const Text(
-                                              'Seleccionar de la galería'),
-                                          onTap: () {
-                                            seleccionarImagen(
-                                                ImageSource.gallery);
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                        ListTile(
-                                          leading:
-                                              const Icon(Icons.photo_camera),
-                                          title: const Text('Tomar foto'),
-                                          onTap: () {
-                                            seleccionarImagen(
-                                                ImageSource.camera);
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              });
-                        },
-                        child: const Text('Seleccionar imagen'),
-                      ),
-                    ),
+                        padding: EdgeInsets.all(8.0), child: Container()),
                   ),
                 ],
               ),
+              SizedBox(height: 10),
+              Text("Vista previa de la imagen",
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colores.gris)),
               if (_imageFile != null) Image.file(_imageFile!),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  if (nombreController.text.isEmpty ||
+                      descripcionController.text.isEmpty ||
+                      existenciasController.text.isEmpty ||
+                      precioFarmController.text.isEmpty ||
+                      precioPubController.text.isEmpty) {
+                    MessageDialog(context,
+                        title: "Error",
+                        description: "Por favor, rellene todos los campos",
+                        buttonText: "ACEPTAR", onReadMore: () {
+                      Navigator.pop(context);
+                    }, showCloseButton: false);
+                  } else {
+                    Map<String, dynamic> datosMedicamento = {
+                      'nombre': capitalize(nombreController.text),
+                      'descripcion': descripcionController.text,
+                      'existencias': int.parse(existenciasController.text),
+                      'precio_farm': double.parse(precioFarmController.text),
+                      'precio_pub': double.parse(precioPubController.text),
+                      'eliminado': 0,
+                    };
+                    await agregarMedicamento(
+                        codigoController.text, datosMedicamento, _imageFile);
+
+                    // Vaciar los campos
+                    codigoController.clear();
+                    existenciasController.clear();
+                    nombreController.clear();
+                    descripcionController.clear();
+                    precioFarmController.clear();
+                    precioPubController.clear();
+
+                    // Mostrar un mensaje
+                    MessageDialog(context,
+                        title: "Éxito",
+                        description: "Medicamento subido con éxito",
+                        buttonText: "ACEPTAR", onReadMore: () {
+                      Navigator.pop(context);
+                    }, showCloseButton: false);
+                  }
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith(
+                      (states) => Colores.verde),
+                  foregroundColor: MaterialStateProperty.resolveWith(
+                      (states) => Colors.white),
+                ),
+                child: const Text(
+                  'Cargar medicamento',
+                ),
+              ),
             ],
           )),
     );

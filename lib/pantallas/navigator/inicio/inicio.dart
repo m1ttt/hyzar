@@ -3,6 +3,7 @@
 import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hyzar/estilos/Colores.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/funciones/pedido.dart';
 import 'package:hyzar/pantallas/navigator_user/pedidos/pedidos_confirm.dart';
 import 'package:hyzar/utilidades/backend/user_notifier.dart';
@@ -21,6 +22,7 @@ class _PantallaUSState extends State<PantallaUS>
     with SingleTickerProviderStateMixin {
   late String userType;
   late String email;
+  late String nombre;
   bool ordenarPorNombre = true;
   bool mostrarSoloEliminados = false;
 
@@ -41,6 +43,9 @@ class _PantallaUSState extends State<PantallaUS>
   void initUserType() async {
     userType = Provider.of<UserNotifier>(context, listen: false).getUserType();
     email = Provider.of<UserNotifier>(context, listen: false).getEmail();
+    nombre = Provider.of<UserNotifier>(context, listen: false)
+        .getNombre()
+        .split(' ')[0];
   }
 
   @override
@@ -86,7 +91,12 @@ class _PantallaUSState extends State<PantallaUS>
               );
             }
 
-            List<Widget> children = snapshot.data!.docs.map((document) {
+            List<Widget> children = snapshot.data!.docs.where((document) {
+              Map<String, dynamic> data =
+                  document.data() as Map<String, dynamic>;
+              return (mostrarSoloEliminados && data['eliminado'] == 1) ||
+                  (!mostrarSoloEliminados && data['eliminado'] == 0);
+            }).map((document) {
               Map<String, dynamic> data =
                   document.data() as Map<String, dynamic>;
               data['id'] = document.id;
@@ -96,90 +106,127 @@ class _PantallaUSState extends State<PantallaUS>
                 Colors.green,
                 existencias / 100, // Asume que 100 es el máximo de existencias
               )!;
-              if (mostrarSoloEliminados && data['eliminado'] == 0) {
-                return const SizedBox(height: 0, width: 0);
-              } else if (!mostrarSoloEliminados && data['eliminado'] == 1) {
-                return const SizedBox(height: 0, width: 0);
-              } else {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetalleMedicamentoScreen(
-                            userType: userType, medicamento: data),
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetalleMedicamentoScreen(
+                          userType: userType, medicamento: data),
+                    ),
+                  );
+                },
+                onLongPress: () {
+                  if (userType == 'usuario') {
+                    setState(() {
+                      _toggleSelection(data['id']);
+                    });
+                  }
+                },
+                child: Hero(
+                  tag: 'detalle${data['id']}',
+                  child: Container(
+                    margin: const EdgeInsets.all(5.0),
+                    color: _selectedItems.contains(data['id'])
+                        ? Colors.blue
+                        : null,
+                    child: Card(
+                      color: color,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
                       ),
-                    );
-                  },
-                  onLongPress: () {
-                    if (userType == 'usuario') {
-                      setState(() {
-                        _toggleSelection(data['id']);
-                      });
-                    }
-                  },
-                  child: Hero(
-                    tag: 'detalle${data['id']}',
-                    child: Container(
-                      margin: const EdgeInsets.all(5.0),
-                      color: _selectedItems.contains(data['id'])
-                          ? Colors.blue
-                          : null,
-                      child: Card(
-                        color: color,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                        child: Column(
-                          children: [
-                            Container(
-                              height:
-                                  120, // Ajusta esto a la altura que desees para la imagen
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(15.0),
-                                ),
-                                image: DecorationImage(
-                                  image: (data['imagen'] == null ||
-                                          data['imagen'] == '')
-                                      ? const AssetImage(
-                                          'lib/assets/NoImagen.png') // Reemplaza esto con la ruta a tu imagen predeterminada
-                                      : CachedNetworkImageProvider(
-                                              data['imagen'])
-                                          as ImageProvider<Object>,
-                                  fit: BoxFit.cover,
+                      child: Column(
+                        children: [
+                          Container(
+                            height:
+                                120, // Ajusta esto a la altura que desees para la imagen
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(15.0),
+                              ),
+                              image: DecorationImage(
+                                image: (data['imagen'] == null ||
+                                        data['imagen'] == '')
+                                    ? const AssetImage(
+                                        'lib/assets/NoImagen.png') // Reemplaza esto con la ruta a tu imagen predeterminada
+                                    : CachedNetworkImageProvider(data['imagen'])
+                                        as ImageProvider<Object>,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              color: Theme.of(context).colorScheme.background,
+                              child: Center(
+                                // Añadido el widget Center
+                                child: Padding(
+                                  padding: const EdgeInsets.all(0),
+                                  child: ListTile(
+                                    title: Text('${data['nombre']}'),
+                                  ),
                                 ),
                               ),
                             ),
-                            Flexible(
-                              child: Container(
-                                color: Theme.of(context).colorScheme.background,
-                                child: ListTile(
-                                  title: Text('${data['nombre']}'),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                );
-              }
+                ),
+              );
             }).toList();
-            return GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing:
-                    2.0, // Espacio entre las tarjetas en la dirección vertical
-                crossAxisSpacing:
-                    2.0, // Espacio entre las tarjetas en la dirección horizontal
-              ),
+            return CustomScrollView(
               controller: _scrollController,
-              itemCount: children.length,
-              itemBuilder: (BuildContext context, int index) {
-                return children[index];
-              },
+              slivers: <Widget>[
+                SliverToBoxAdapter(
+                  child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 3, left: 20, right: 20, bottom: 10),
+                      child: Column(
+                        children: [
+                          Text(
+                            userType == 'admin'
+                                ? "Modo administrador activado"
+                                : "¿Qué vas a pedir hoy, ${nombre}?",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colores.gris,
+                            ),
+                          ),
+                          userType == 'admin'
+                              ? Text(
+                                  "Cuidado, tienes el control total desde ahora",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colores.gris,
+                                      fontWeight: FontWeight.bold),
+                                )
+                              : Text(
+                                  "Desliza hacia abajo para ver más productos",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colores.gris,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                        ],
+                      )),
+                ),
+                SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 0,
+                    crossAxisSpacing: 0,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return children[index];
+                    },
+                    childCount: children.length,
+                  ),
+                ),
+              ],
             );
           },
         ),
