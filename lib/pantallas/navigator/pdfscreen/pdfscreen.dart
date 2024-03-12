@@ -48,13 +48,14 @@ class _PdfScreenState extends State<PdfScreen> {
 
   Future<String> createPdf() async {
     String totalEnTexto =
-        SpellingNumber(lang: 'es').convert(widget.detallesPedido['total']);
+      SpellingNumber(lang: 'es').convert(widget.detallesPedido['saldoAnterior'] != null ? widget.detallesPedido['saldoAnterior'] : widget.detallesPedido['total']);
     final pdf = pdfWidgets.Document();
 
     final fontData =
         await rootBundle.load("lib/estilos/fonts/OpenSans-Medium.ttf");
     final ttf = pdfWidgets.Font.ttf(fontData);
 
+    
     // Cargar el logo
     final logoData = await rootBundle.load('lib/assets/HyzarLogoWB.png');
     Uint8List logoImage = logoData.buffer.asUint8List();
@@ -119,7 +120,7 @@ class _PdfScreenState extends State<PdfScreen> {
             ),
             pdfWidgets.Paragraph(
                 text:
-                    '\$${widget.detallesPedido['total']} (${totalEnTexto}) pesos',
+                    '\$${widget.detallesPedido['saldoAnterior'] != null ? widget.detallesPedido['saldoAnterior'].toString() + " (pagado)" : widget.detallesPedido['total']} (${totalEnTexto}) pesos',
                 style: pdfWidgets.TextStyle(fontSize: 20, font: ttf)),
             pdfWidgets.Expanded(
               child: pdfWidgets.Align(

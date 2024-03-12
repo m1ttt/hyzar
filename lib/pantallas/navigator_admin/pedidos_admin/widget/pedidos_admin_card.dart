@@ -169,6 +169,15 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                             double totalPedidos =
                                 (pedidoDoc.get('$pedidoID.total') as num)
                                     .toDouble();
+
+                          
+                            // Agregar el campo saldoAnterior antes de actualizar el total
+                            await FirebaseFirestore.instance
+                                .collection('pedidos')
+                                .doc(idUsuario)
+                                .update(
+                                    {'$pedidoID.saldoAnterior': totalPedidos});
+
                             await FirebaseFirestore.instance
                                 .collection('pedidos')
                                 .doc(idUsuario)
@@ -237,6 +246,7 @@ class _PedidosAdminCardState extends State<PedidosAdminCard> {
                           ),
                           label: const Text('Imprimir PDF'),
                           onPressed: () {
+                            print(detallesPedido);
                             PdfUtils.generarPDF(
                                 detallesPedido, pedidoID, context);
                           },

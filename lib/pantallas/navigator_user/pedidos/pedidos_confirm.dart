@@ -84,7 +84,7 @@ class _PantallaPedidosConfirmState extends State<PantallaPedidosConfirm> {
                                 )
                               : const Icon(Icons.warning, color: Colors.red),
                           title: Text(data['nombre']),
-                          subtitle: Text('Precio: ${data['precio_farm']}'),
+                          subtitle: Text('Precio: ${data['precio_farm']} MXN'),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [

@@ -189,27 +189,42 @@ class _PantallaUSState extends State<PantallaUS>
                             userType == 'admin'
                                 ? "Modo administrador activado"
                                 : "¿Qué vas a pedir hoy, ${nombre}?",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colores.gris,
                             ),
                           ),
                           userType == 'admin'
-                              ? Text(
+                              ? const Text(
                                   "Cuidado, tienes el control total desde ahora",
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: Colores.gris,
                                       fontWeight: FontWeight.bold),
                                 )
-                              : Text(
-                                  "Desliza hacia abajo para ver más productos",
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colores.gris,
-                                      fontWeight: FontWeight.bold),
-                                ),
+                              : Container(
+                                  child: Column(
+                                    children: const [
+                                      Text(
+                                        "Desliza hacia abajo para ver más productos o",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colores.gris,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        "manten presionado un producto para seleccionarlo",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colores.gris,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
                         ],
                       )),
                 ),
